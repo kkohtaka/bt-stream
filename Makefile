@@ -8,7 +8,7 @@ run: bt-stream
 bt-stream: main.o libuv/out/Debug/libuv.a http-parser/http_parser.o
 	${CC} -o $@ main.o libuv/out/Debug/libuv.a http-parser/http_parser.o ${LIBS}
 
-main.o: main.c
+main.o: main.cc
 	${CC} ${CFLAGS} -c $<
 
 libuv/out/Debug/libuv.a:

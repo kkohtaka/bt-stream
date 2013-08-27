@@ -1,14 +1,24 @@
 CC=g++
-CFLAGS=-O2 -Wall -Werror -I/usr/local/include
-LIBS=-lrt -pthread -std=gnu++0x
+CFLAGS=-O2 -Wall -Werror -std=gnu++0x
+LIBS=-lrt -pthread
+
+OBJS= \
+	main.o \
+	movie_fragment.o \
+	stream.o \
+	controlled_stream.o \
+	client.o \
+	stream_client.o \
+
+.SUFFIXES: .o .cc
 
 run: bt-stream
 	./bt-stream
 
-bt-stream: main.o libuv/out/Debug/libuv.a http-parser/http_parser.o
-	${CC} -o $@ main.o libuv/out/Debug/libuv.a http-parser/http_parser.o ${LIBS}
+bt-stream: ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser.o
+	${CC} -o $@ ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser.o ${LIBS}
 
-main.o: main.cc
+.cc.o:
 	${CC} ${CFLAGS} -c $<
 
 libuv/out/Debug/libuv.a:

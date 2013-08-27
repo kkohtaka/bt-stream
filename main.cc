@@ -1,3 +1,5 @@
+#include "client.h"
+
 #include "libuv/include/uv.h"
 #include "http-parser/http_parser.h"
 
@@ -14,15 +16,7 @@ static char const * const RESPONSE = \
   "hello world\n";
 
 static uv_loop_t *loop;
-static int request_num = 0;
 static http_parser_settings parser_settings;
-
-typedef struct {
-  uv_tcp_t handle;
-  http_parser parser;
-  uv_write_t write_req;
-  int request_num;
-} client_t;
 
 typedef struct {
   uv_write_t req;
@@ -33,7 +27,7 @@ void on_close(uv_handle_t *handle) {
 
   std::cout << "on_close" << std::endl;
 
-  client_t *client = static_cast<client_t *>(handle->data);
+  Client *client = static_cast<Client *>(handle->data);
 
   delete client;
 }
@@ -49,20 +43,19 @@ void on_read(uv_stream_t *tcp, ssize_t nread, uv_buf_t buf) {
 
   std::cout << "on_read" << std::endl;
 
-  client_t *client = static_cast<client_t *>(tcp->data);
+  Client *client = static_cast<Client *>(tcp->data);
 
   std::cout << "nread: " << nread << std::endl;
   if (nread >= 0) {
 
-    int parsed = http_parser_execute(
-        &client->parser,
+    int parsed = client->parse_request(
         &parser_settings,
-        buf.base,
-        nread
+        nread,
+        buf
     );
     if (parsed < nread) {
       std::cerr << "parse error" << std::endl;
-      uv_close(reinterpret_cast<uv_handle_t *>(&client->handle), on_close);
+      client->close(on_close);
     }
   } else {
     if (nread != UV_EOF) {
@@ -81,20 +74,12 @@ void on_connect(uv_stream_t *server, int status) {
     return;
   }
 
-  request_num += 1;
-  client_t *client = new client_t;
-  client->request_num = request_num;
+  Client *client = new Client(loop);
 
-  uv_tcp_init(loop, &client->handle);
-  http_parser_init(&client->parser, HTTP_REQUEST);
-
-  client->parser.data = client;
-  client->handle.data = client;
-
-  if (uv_accept(server, reinterpret_cast<uv_stream_t *>(&client->handle)) == 0) {
-    uv_read_start(reinterpret_cast<uv_stream_t *>(&client->handle), on_alloc, on_read);
+  if (client->accept(server) == 0) {
+    client->start_reading(on_alloc, on_read);
   } else {
-    uv_close(reinterpret_cast<uv_handle_t *>(&client->handle), on_close);
+    client->close(on_close);
   }
 }
 
@@ -113,20 +98,14 @@ int on_headers_complete(http_parser *parser) {
 
   std::cout << "on_headers_complete" << std::endl;
 
-  client_t *client = static_cast<client_t *>(parser->data);
+  Client *client = static_cast<Client *>(parser->data);
 
   ssize_t len = strlen(RESPONSE);
   write_req_t *wr = new write_req_t;
   wr->buf = uv_buf_init(new char[len], len);
   strncpy(wr->buf.base, RESPONSE, len);
 
-  uv_write(
-      &wr->req,
-      reinterpret_cast<uv_stream_t *>(&client->handle),
-      &wr->buf,
-      1,
-      on_write
-  );
+  client->write(&wr->req, &wr->buf, 1, on_write);
 
   return 1;
 }

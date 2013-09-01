@@ -1,12 +1,15 @@
 #include "client.h"
+#include "stream.h"
+#include "stream_input.h"
 
 #include "libuv/include/uv.h"
 #include "http-parser/http_parser.h"
 
-#include "cstdio"
-#include "cstdlib"
-#include "cstring"
-#include "iostream"
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <memory>
+#include <iostream>
 
 static char const * const RESPONSE = \
   "HTTP/1.1 200 OK\r\n" \
@@ -17,6 +20,8 @@ static char const * const RESPONSE = \
 
 static uv_loop_t *loop;
 static http_parser_settings parser_settings;
+
+static std::shared_ptr<StreamInput> input;
 
 typedef struct {
   uv_write_t req;
@@ -35,7 +40,7 @@ void on_close(uv_handle_t *handle) {
 uv_buf_t on_alloc(uv_handle_t *handle, size_t suggested_size) {
 
   std::cout << "on_alloc" << std::endl;
-
+  std::cout << "suggested_size: " << suggested_size << std::endl;
   return uv_buf_init(new char[suggested_size], suggested_size);
 }
 
@@ -74,12 +79,15 @@ void on_connect(uv_stream_t *server, int status) {
     return;
   }
 
-  Client *client = new Client(loop);
+  auto client = std::shared_ptr<Client>(new Client(loop));
 
-  if (client->accept(server) == 0) {
-    client->start_reading(on_alloc, on_read);
+  if (client.get()->accept(server) == 0) {
+    //client.start_reading(on_alloc, on_read);
+    auto stream = std::shared_ptr<Stream>(new Stream());;
+    input = std::shared_ptr<StreamInput>(new StreamInput(stream, client));
+    input.get()->run();
   } else {
-    client->close(on_close);
+    client.get()->close(on_close);
   }
 }
 

@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-O2 -Wall -Werror -std=gnu++0x
+CFLAGS=-g -O0 -Wall -Werror -std=gnu++0x
 LIBS=-lrt -pthread
 
 OBJS= \
@@ -9,6 +9,11 @@ OBJS= \
 	controlled_stream.o \
 	client.o \
 	stream_client.o \
+	stream_input.o \
+	stream_input_state.o \
+	header_detection_state.o \
+	streaming_state.o \
+	ebml.o \
 
 .SUFFIXES: .o .cc
 

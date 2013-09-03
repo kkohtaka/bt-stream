@@ -52,7 +52,7 @@ int HeaderDetectionState::process_data(
   );
   header_length += ebml.element_size();
 
-  offset = ebml.element_offset();
+  offset = ebml.end_offset();
 
   // Copy an infinite segment.
   ::memcpy(

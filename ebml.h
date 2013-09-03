@@ -3,8 +3,8 @@
 
 class EBML {
  private:
-  int id_;
-  int size_;
+  long id_;
+  long size_;
   char *buffer_;
   unsigned int length_;
   unsigned int offset_;
@@ -12,27 +12,27 @@ class EBML {
  public:
   EBML(
       char *buffer,
-      unsigned int length,
-      unsigned int offset
+      unsigned int offset,
+      unsigned int length
   );
   ~EBML(void);
   static int load_unsigned(
       char *buffer,
-      unsigned int length,
-      unsigned int offset
+      unsigned int offset,
+      unsigned int length
   );
   static int load_EBML_unsigned(
       char *buffer,
-      unsigned int length,
-      unsigned int offset
+      unsigned int offset,
+      unsigned int length
   );
   static int load_EBML_signed(
       char *buffer,
-      unsigned int length,
-      unsigned int offset
+      unsigned int offset,
+      unsigned int length
   );
-  int id(void);
-  unsigned int data_size(void);
+  long id(void);
+  long data_size(void);
   int element_size(void);
   char *buffer(void);
   unsigned int data_offset(void);

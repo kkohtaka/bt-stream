@@ -2,15 +2,18 @@
 
 EBML::EBML(
     char *buffer,
-    unsigned int length,
-    unsigned int offset
+    unsigned int offset,
+    unsigned int length
 ) :
+    id_(0),
+    size_(0),
     buffer_(buffer),
     length_(length),
-    offset_(offset) {
+    offset_(offset),
+    data_offset_(0) {
 
-  int size_flag = 0x80;
-  int num = 0;
+  long size_flag = 0x80;
+  long num = 0;
   while (((num |= buffer[offset++] & 0xff) & size_flag) == 0 && size_flag != 0) {
     num <<= 8;
     size_flag <<= 7;
@@ -33,11 +36,11 @@ EBML::~EBML(void) {
 
 int EBML::load_unsigned(
     char *buffer,
-    unsigned int length,
-    unsigned int offset
+    unsigned int offset,
+    unsigned int length
 ) {
 
-  int num = 0;
+  long num = 0;
   while (length > 0) {
     --length;
     num <<= 8;
@@ -48,12 +51,12 @@ int EBML::load_unsigned(
 
 int EBML::load_EBML_unsigned(
     char *buffer,
-    unsigned int length,
-    unsigned int offset
+    unsigned int offset,
+    unsigned int length
 ) {
 
-  int size_flag = 0x80;
-  int num = 0;
+  long size_flag = 0x80;
+  long num = 0;
   while (((num |= buffer[offset++] & 0xff) & size_flag) == 0 && size_flag != 0) {
     num <<= 8;
     size_flag <<= 7;
@@ -63,13 +66,13 @@ int EBML::load_EBML_unsigned(
 
 int EBML::load_EBML_signed(
     char *buffer,
-    unsigned int length,
-    unsigned int offset
+    unsigned int offset,
+    unsigned int length
 ) {
 
-  int size_flag = 0x80;
-  int num = 0;
-  int neg_bits = -1 << 7;
+  long size_flag = 0x80;
+  long num = 0;
+  long neg_bits = -1 << 7;
   while (((num |= buffer[offset++] & 0xff) & size_flag) == 0 && size_flag != 0) {
     num <<= 8;
     size_flag <<= 7;
@@ -81,12 +84,12 @@ int EBML::load_EBML_signed(
   return num;
 }
 
-int EBML::id(void) {
+long EBML::id(void) {
 
   return id_;
 }
 
-unsigned int EBML::data_size(void) {
+long EBML::data_size(void) {
 
   return size_;
 }

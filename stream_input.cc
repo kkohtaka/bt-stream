@@ -105,9 +105,9 @@ void StreamInput::on_read(ssize_t nread, uv_buf_t buf) {
 
   time_t now;
   time(&now);
-  double elapsed_time = ::difftime(now, timer_);
+  //double elapsed_time = ::difftime(now, timer_);
 
-  std::cout << "elapsed_time: " << elapsed_time << std::endl;
+  //std::cout << "elapsed_time: " << elapsed_time << std::endl;
 
   // [TODO] stream.postEvent(new TransferEvent(this, stream, TransferEvent.STREAM_INPUT, numBytes, new Date().getTime() - transferStart));
 

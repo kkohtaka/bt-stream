@@ -26,9 +26,22 @@ int StreamingState::process_data(
 ) {
 
   const unsigned int end_offset = offset + length;
-
-  while (offset < end_offset - 12) {
-
+#if 0
+  std::cout << "process_data: offset: " << offset << ", length: " << length << std::endl;
+  for (unsigned int i = 0; i < 32 && i < length; ++i) {
+    std::cout << (int)*(buffer + i) << ' ';
+  }
+  std::cout << std::endl;
+#endif
+  //while (offset < end_offset - 12) {
+  while (offset < end_offset) {
+#if 0
+    std::cout << "process_data(while): offset: " << offset << std::endl;
+    for (unsigned int i = 0; i < 32 && i + offset < length; ++i) {
+      std::cout << (int)*(buffer + i + offset) << ' ';
+    }
+    std::cout << std::endl;
+#endif
     EBML ebml(buffer, offset, length);
 
     /* Note: cluster check was moved to be the first because of the
@@ -36,6 +49,9 @@ int StreamingState::process_data(
      */
     if (ebml.id() != ID_CLUSTER && static_cast<unsigned int>(ebml.end_offset()) > end_offset) {
 
+      std::cout << "=> ebml.id: " << ebml.id() << ", ID_CLUSTER: " << ID_CLUSTER << std::endl;
+      std::cout << "=> ebml.end_offset: " << ebml.end_offset() << ", end_offset: " << end_offset <<  std::endl;
+      std::cout << "=> ebml.element_offset: " << ebml.element_offset() <<  std::endl;
       /* The element is not fully loaded: we need more data, so we end
        * this processing cycle. The StreamInput will fill the buffer
        * and take care of the yet unprocessed element. We signal this
@@ -55,6 +71,7 @@ int StreamingState::process_data(
 
     case ID_TIMECODE: {
 
+      std::cout << "ID_TIMECODE" << std::endl;
       // we have the timecode, so open a new cluster in our movie fragment
       cluster_time_code_ = EBML::load_unsigned(buffer, ebml.data_offset(), ebml.data_size());
 
@@ -65,6 +82,7 @@ int StreamingState::process_data(
     }
     case ID_SIMPLEBLOCK: {
 
+      std::cout << "ID_SIMPLEBLOCK" << std::endl;
       int track_num = buffer[ebml.data_offset()] & 0xff;
       if ((track_num & 0x80) == 0) {
         std::cerr << "Track numbers > 127 are not implemented." << std::endl;
@@ -108,6 +126,7 @@ int StreamingState::process_data(
     }
     case ID_BLOCKGROUP: {
 
+      std::cout << "ID_BLOCKGROUP" << std::endl;
       fragment_.get()->append_block(
           buffer,
           ebml.element_offset(),
@@ -118,6 +137,7 @@ int StreamingState::process_data(
     }
     default:
 
+      std::cout << "ID_UNHANDLED" << std::endl;
       break;
     }
 

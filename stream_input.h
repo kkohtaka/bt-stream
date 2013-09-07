@@ -30,12 +30,15 @@ class StreamInput {
   bool running_;
   unsigned char *header_;
   unsigned int header_length_;
+  int head_size_;
+  int chunk_size_;
   std::shared_ptr<StreamInputState> state_;
   StreamInputBuffer buffer_;
   time_t timer_;
   uv_buf_t on_alloc(size_t suggested_size);
   void on_read(ssize_t nread, uv_buf_t buf);
   void on_close(void);
+  int refresh_chunk_size(void);
  public:
   StreamInput(
       std::shared_ptr<Stream> stream,

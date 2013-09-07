@@ -1,5 +1,7 @@
 #include "stream.h"
 
+#include <iostream>
+
 Stream::Stream(void) :
     running_(true),
     header_(),
@@ -50,5 +52,7 @@ void Stream::push_fragment(std::shared_ptr<MovieFragment> fragment) {
 
   fragment_ = fragment;
   ++fragment_age_;
+
+  std::cout << "fragment_age: " << fragment_age_ << std::endl;
 }
 

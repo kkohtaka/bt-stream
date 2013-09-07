@@ -27,6 +27,12 @@ int HeaderDetectionState::process_data(
     unsigned int length
 ) {
 
+  std::cout << "process_data: offset: " << offset << ", length: " << length << std::endl;
+  for (unsigned int i = 0; i < 32 && i < length; ++i) {
+    std::cout << (int)*(buffer + i) << ' ';
+  }
+  std::cout << std::endl;
+
   const unsigned int
       start_offset = offset,
       end_offset = offset + length;

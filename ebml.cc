@@ -1,5 +1,9 @@
 #include "ebml.h"
 
+#include <iostream>
+
+#include <cstdlib>
+
 EBML::EBML(
     char *buffer,
     unsigned int offset,
@@ -11,6 +15,14 @@ EBML::EBML(
     length_(length),
     offset_(offset),
     data_offset_(0) {
+
+  std::cout << "=== EBML === ";
+  for (unsigned int i = 0; i < 32 && i < length; ++i) {
+    std::cout << (int)*(buffer + offset + i) << ' ';
+  }
+  std::cout << std::endl;
+
+  std::cout << "=== EBML === offset: " << offset << ", length: " << length << std::endl;
 
   long size_flag = 0x80;
   long num = 0;
@@ -29,6 +41,8 @@ EBML::EBML(
   size_ = num ^ size_flag;
 
   data_offset_ = offset;
+
+  std::cout << "==> EBML::id: " << id_ << ", size: " << size_ << ", data_offset: " << data_offset_ << std::endl;
 }
 
 EBML::~EBML(void) {
@@ -126,6 +140,9 @@ int EBML::end_offset(void) {
   }
   if ((data_offset_ + size_) >= 0x100000000L) {
     // [TODO] Handle the error.
+    std::cout << "data_offset_: " << data_offset_ << std::endl;
+    std::cout << "size_: " << size_ << std::endl;
+    ::exit(EXIT_FAILURE);
   }
   return data_offset_ + size_;
 }

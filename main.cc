@@ -37,6 +37,33 @@ void on_close(uv_handle_t *handle) {
   delete client;
 }
 
+void on_write(uv_write_t *req, int status) {
+
+  std::cout << "on_write" << std::endl;
+
+  uv_close(reinterpret_cast<uv_handle_t *>(req->handle), on_close);
+
+  write_req_t *wr = reinterpret_cast<write_req_t *>(req);
+  delete wr->buf.base;
+  delete wr;
+}
+
+int on_headers_complete(http_parser *parser) {
+
+  std::cout << "on_headers_complete" << std::endl;
+
+  Client *client = static_cast<Client *>(parser->data);
+
+  ssize_t len = strlen(RESPONSE);
+  write_req_t *wr = new write_req_t;
+  wr->buf = uv_buf_init(new char[len], len);
+  strncpy(wr->buf.base, RESPONSE, len);
+
+  client->write(&wr->req, &wr->buf, 1, on_write);
+
+  return 1;
+}
+
 uv_buf_t on_alloc(uv_handle_t *handle, size_t suggested_size) {
 
   std::cout << "on_alloc" << std::endl;
@@ -79,43 +106,24 @@ void on_connect(uv_stream_t *server, int status) {
     return;
   }
 
+#if 0
+  auto client = new Client(loop);
+  if (client->accept(server) == 0) {
+    client->start_reading(on_alloc, on_read);
+  } else {
+    client->close(on_close);
+  }
+#else
   auto client = std::shared_ptr<Client>(new Client(loop));
 
   if (client.get()->accept(server) == 0) {
-    //client.start_reading(on_alloc, on_read);
     auto stream = std::shared_ptr<Stream>(new Stream());;
     input = std::shared_ptr<StreamInput>(new StreamInput(stream, client));
     input.get()->run();
   } else {
     client.get()->close(on_close);
   }
-}
-
-void on_write(uv_write_t *req, int status) {
-
-  std::cout << "on_write" << std::endl;
-
-  uv_close(reinterpret_cast<uv_handle_t *>(req->handle), on_close);
-
-  write_req_t *wr = reinterpret_cast<write_req_t *>(req);
-  delete wr->buf.base;
-  delete wr;
-}
-
-int on_headers_complete(http_parser *parser) {
-
-  std::cout << "on_headers_complete" << std::endl;
-
-  Client *client = static_cast<Client *>(parser->data);
-
-  ssize_t len = strlen(RESPONSE);
-  write_req_t *wr = new write_req_t;
-  wr->buf = uv_buf_init(new char[len], len);
-  strncpy(wr->buf.base, RESPONSE, len);
-
-  client->write(&wr->req, &wr->buf, 1, on_write);
-
-  return 1;
+#endif
 }
 
 int main() {

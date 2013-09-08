@@ -1,19 +1,22 @@
 #include "client.h"
 
+#include <iostream>
+
 Client::Client(uv_loop_t *loop) :
     handle_(),
     parser_(),
     write_req_(),
     data_(nullptr) {
 
-  uv_tcp_init(loop, &handle_);
-  http_parser_init(&parser_, HTTP_REQUEST);
+  ;;uv_tcp_init(loop, &handle_);
+  ::http_parser_init(&parser_, HTTP_REQUEST);
 
   handle_.data = this;
   parser_.data = this;
 }
 
 Client::~Client(void) {
+  std::cout << "Client deleted." << std::endl;
 }
 
 int Client::parse_request(

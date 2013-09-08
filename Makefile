@@ -20,8 +20,8 @@ OBJS= \
 run: bt-stream
 	./bt-stream
 
-bt-stream: ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser.o
-	${CC} -o $@ ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser.o ${LIBS}
+bt-stream: ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser_g.o
+	${CC} -o $@ ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser_g.o ${LIBS}
 
 .cc.o:
 	${CC} ${CFLAGS} -c $<
@@ -35,8 +35,8 @@ libuv/out/Debug/libuv.a:
 		make -C out/; \
 	)
 
-http-parser/http_parser.o:
-	make -C http-parser/ http_parser.o
+http-parser/http_parser_g.o: http-parser/http_parser.c
+	make -C http-parser/ http_parser_g.o
 
 clean:
 	rm bt-stream

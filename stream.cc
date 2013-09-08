@@ -10,6 +10,7 @@ Stream::Stream(void) :
 }
 
 Stream::~Stream(void) {
+  std::cout << "Stream deleted." << std::endl;
 }
 
 bool Stream::is_running(void) {

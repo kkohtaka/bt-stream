@@ -47,7 +47,7 @@ int HeaderDetectionState::process_data(
 
   if (ebml.id() != ID_EBML) {
     std::cerr << "First element is not EBML!" << std::endl;
-    return -1;
+    throw std::exception();
   }
 
   // Copy EBML header buffer.

@@ -16,18 +16,19 @@ Client::Client(uv_loop_t *loop) :
 }
 
 Client::~Client(void) {
-  std::cout << "Client deleted." << std::endl;
 }
 
 int Client::parse_request(
-    http_parser_settings *parser_settings,
     ssize_t nread,
-    uv_buf_t buf
+    uv_buf_t buf,
+    http_data_cb on_body
 ) {
 
+  static http_parser_settings settings;
+  settings.on_body = on_body;
   return http_parser_execute(
     &parser_,
-    parser_settings,
+    &settings,
     buf.base,
     nread
   );

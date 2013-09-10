@@ -10,7 +10,6 @@ Stream::Stream(void) :
 }
 
 Stream::~Stream(void) {
-  std::cout << "Stream deleted." << std::endl;
 }
 
 bool Stream::is_running(void) {
@@ -54,6 +53,6 @@ void Stream::push_fragment(std::shared_ptr<MovieFragment> fragment) {
   fragment_ = fragment;
   ++fragment_age_;
 
-  std::cout << "fragment_age: " << fragment_age_ << std::endl;
+  std::cout << "===== FRAGMENT AGE: " << fragment_age_ << " =====" << std::endl;
 }
 

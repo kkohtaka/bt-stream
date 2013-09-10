@@ -37,7 +37,7 @@ class StreamInput {
   uv_buf_t on_alloc(size_t suggested_size);
   void on_read(ssize_t nread, uv_buf_t buf);
   void on_close(void);
-  int refresh_chunk_size(void);
+  int on_body(const char *buf, size_t len);
  public:
   StreamInput(
       std::shared_ptr<Stream> stream,

@@ -37,6 +37,8 @@ int HeaderDetectionState::process_data(
       start_offset = offset,
       end_offset = offset + length;
 
+  std::cout << "=== start_offset: " << start_offset << ", end_offset: " << end_offset << std::endl;
+
   std::shared_ptr<unsigned char> header_buffer(
       new unsigned char[65536],
       [] (unsigned char *p) { delete [] p; }
@@ -117,6 +119,7 @@ int HeaderDetectionState::process_data(
 
   // Not found.
   if (offset >= end_offset) {
+    std::cout << "Tracks not found." << std::endl;
     return start_offset;
   }
 

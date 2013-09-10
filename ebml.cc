@@ -16,6 +16,7 @@ EBML::EBML(
     offset_(offset),
     data_offset_(0) {
 
+#if 0
   std::cout << "=== EBML === ";
   for (unsigned int i = 0; i < 32 && i < length; ++i) {
     std::cout << (int)*(buffer + offset + i) << ' ';
@@ -23,6 +24,7 @@ EBML::EBML(
   std::cout << std::endl;
 
   std::cout << "=== EBML === offset: " << offset << ", length: " << length << std::endl;
+#endif
 
   long size_flag = 0x80;
   long num = 0;

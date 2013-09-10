@@ -5,7 +5,7 @@
 #include "http-parser/http_parser.h"
 
 class Client {
- protected:
+ private:
   uv_tcp_t handle_;
   http_parser parser_;
   uv_write_t write_req_;
@@ -14,9 +14,9 @@ class Client {
   explicit Client(uv_loop_t *loop);
   virtual ~Client(void);
   int parse_request(
-      http_parser_settings *parser_settings,
       ssize_t nread,
-      uv_buf_t buf
+      uv_buf_t buf,
+      http_data_cb on_body
   );
   int accept(uv_stream_t *server);
   void start_reading(uv_alloc_cb alloc_cb, uv_read_cb read_cb);

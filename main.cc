@@ -71,6 +71,7 @@ uv_buf_t on_alloc(uv_handle_t *handle, size_t suggested_size) {
   return uv_buf_init(new char[suggested_size], suggested_size);
 }
 
+#if 0
 void on_read(uv_stream_t *tcp, ssize_t nread, uv_buf_t buf) {
 
   std::cout << "on_read" << std::endl;
@@ -97,6 +98,7 @@ void on_read(uv_stream_t *tcp, ssize_t nread, uv_buf_t buf) {
 
   delete [] buf.base;
 }
+#endif
 
 void on_connect(uv_stream_t *server, int status) {
 

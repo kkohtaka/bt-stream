@@ -11,3 +11,8 @@
 *.lai
 *.la
 *.a
+
+# Compiled Executabl files
+/bt-stream
+/core
+*.o

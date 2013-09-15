@@ -8,9 +8,9 @@
 class Stream {
  private:
   int running_;
-  std::shared_ptr<unsigned char> header_;
+  std::shared_ptr<char> header_;
   unsigned int header_length_;
-  int fragment_age_;
+  unsigned int fragment_age_;
   std::shared_ptr<MovieFragment> fragment_;
  public:
   Stream(void);
@@ -18,9 +18,9 @@ class Stream {
   bool is_running(void);
   int fragment_age(void);
   std::shared_ptr<MovieFragment> fragment(void);
-  std::shared_ptr<unsigned char> header(void);
+  std::shared_ptr<char> header(void);
   unsigned int header_length(void);
-  void set_header(std::shared_ptr<unsigned char> header, unsigned int header_length);
+  void set_header(std::shared_ptr<char> header, int header_length);
   void push_fragment(std::shared_ptr<MovieFragment> fragment);
 };
 

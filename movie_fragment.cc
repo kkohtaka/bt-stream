@@ -1,5 +1,6 @@
 #include "movie_fragment.h"
 
+#include <iostream>
 #include <cstring>
 
 MovieFragment::MovieFragment(void) :
@@ -14,7 +15,7 @@ MovieFragment::MovieFragment(void) :
         0x00, 0x00, 0x00
     }),
     CLUSTER_HEAD_LENGTH(sizeof(CLUSTER_HEAD)),
-    data_(new unsigned char[1024 * 1024], [] (unsigned char *p) { delete [] p; }),
+    data_(new char[1024 * 1024], [] (char *p) { delete [] p; }),
     data_length_(0),
     cluster_offset_(-1),
     keyframe_offset_(-1),
@@ -32,6 +33,8 @@ MovieFragment& MovieFragment::operator=(const MovieFragment& movie_fragment) {
 }
 
 MovieFragment::~MovieFragment(void) {
+
+  std::cout << "MovieFragment deleted." << std::endl;
 }
 
 void MovieFragment::open_cluster(int time_code) {
@@ -103,7 +106,7 @@ void MovieFragment::append_block(
   data_length_ += length;
 }
 
-std::shared_ptr<unsigned char> MovieFragment::data(void) {
+std::shared_ptr<char> MovieFragment::data(void) {
 
   return data_;
 }

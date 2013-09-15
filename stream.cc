@@ -10,6 +10,9 @@ Stream::Stream(void) :
 }
 
 Stream::~Stream(void) {
+
+  std::cout << "Stream deleted." << std::endl;
+  std::cout.flush();
 }
 
 bool Stream::is_running(void) {
@@ -27,7 +30,7 @@ std::shared_ptr<MovieFragment> Stream::fragment(void) {
   return fragment_;
 }
 
-std::shared_ptr<unsigned char> Stream::header(void) {
+std::shared_ptr<char> Stream::header(void) {
 
   return header_;
 }
@@ -37,9 +40,9 @@ unsigned int Stream::header_length(void) {
   return header_length_;
 }
 
-void Stream::set_header(std::shared_ptr<unsigned char> header, unsigned int header_length) {
+void Stream::set_header(std::shared_ptr<char> header, int header_length) {
 
-  header_ = header;
+  header_.swap(header);
   header_length_ = header_length;
 }
 
@@ -50,7 +53,7 @@ void Stream::push_fragment(std::shared_ptr<MovieFragment> fragment) {
     // [TODO] post a server event
   }
 
-  fragment_ = fragment;
+  fragment_.swap(fragment);
   ++fragment_age_;
 
   std::cout << "===== FRAGMENT AGE: " << fragment_age_ << " =====" << std::endl;

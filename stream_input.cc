@@ -22,6 +22,7 @@ StreamInput::StreamInput(
 }
 
 StreamInput::~StreamInput(void) {
+
   std::cout << "StreamInput deleted." << std::endl;
 }
 
@@ -81,7 +82,7 @@ void StreamInput::run(void) {
 
 void StreamInput::change_state(std::shared_ptr<StreamInputState> state) {
 
-  state_ = state;
+  state_.swap(state);
 }
 
 uv_buf_t StreamInput::on_alloc(size_t suggested_size) {
@@ -112,7 +113,7 @@ void StreamInput::on_read(ssize_t nread, uv_buf_t buf) {
 
   } else {
 
-    int parsed = client_.get()->parse_request(
+    client_.get()->parse_request(
         nread,
         buf,
         [] (http_parser *parser, const char *buf, size_t len) {
@@ -123,7 +124,6 @@ void StreamInput::on_read(ssize_t nread, uv_buf_t buf) {
           return self->on_body(buf, len);
         }
     );
-    std::cout << "parsed: " << parsed << std::endl;
   }
 }
 
@@ -147,7 +147,9 @@ int StreamInput::on_body(const char *buf, size_t len) {
 
     if (new_offset == 0) {
 
+#if DEBUG_PUBLISHER
       std::cout << "=== DATA WAS PROCESSED. ===" << std::endl;
+#endif
       break;
     }
 

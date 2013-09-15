@@ -1,5 +1,7 @@
 #include "controlled_stream.h"
 
+#include <iostream>
+
 ControlledStream::ControlledStream(unsigned int max_clients) :
     Stream(),
     MAX_CLIENTS(max_clients),
@@ -7,6 +9,8 @@ ControlledStream::ControlledStream(unsigned int max_clients) :
 }
 
 ControlledStream::~ControlledStream(void) {
+
+  std::cout << "ControlledStream deleted." << std::endl;
 }
 
 bool ControlledStream::subscribe(void) {

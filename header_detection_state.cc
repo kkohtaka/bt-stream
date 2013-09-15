@@ -19,6 +19,8 @@ HeaderDetectionState::HeaderDetectionState(
 }
 
 HeaderDetectionState::~HeaderDetectionState(void) {
+
+  std::cout << "HeaderDetectionState deleted." << std::endl;
 }
 
 int HeaderDetectionState::process_data(
@@ -169,9 +171,9 @@ int HeaderDetectionState::process_data(
 
   std::cout << "All's well." << std::endl;
 
-  std::shared_ptr<unsigned char> header(
-      new unsigned char[header_length],
-      [] (unsigned char *p) { delete [] p; }
+  std::shared_ptr<char> header(
+      new char[header_length],
+      [] (char *p) { delete [] p; }
   );
   ::memcpy(header.get(), header_buffer.get(), header_length);
   stream_.get()->set_header(header, header_length);

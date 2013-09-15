@@ -11,7 +11,7 @@ class MovieFragment {
   const int CLUSTER_LENGTH_LAST_OFFSET;
   unsigned char CLUSTER_HEAD[19];
   const unsigned int CLUSTER_HEAD_LENGTH;
-  std::shared_ptr<unsigned char> data_;
+  std::shared_ptr<char> data_;
   int data_length_;
   int cluster_offset_;
   int keyframe_offset_;
@@ -33,7 +33,7 @@ class MovieFragment {
       int offset,
       int length
   );
-  std::shared_ptr<unsigned char> data(void);
+  std::shared_ptr<char> data(void);
   int data_length(void);
   int keyframe_offset(void);
   int keyframe_length(void);

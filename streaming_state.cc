@@ -17,6 +17,8 @@ StreamingState::StreamingState(
 }
 
 StreamingState::~StreamingState(void) {
+
+  std::cout << "StreamingState deleted." << std::endl;
 }
 
 int StreamingState::process_data(
@@ -49,9 +51,11 @@ int StreamingState::process_data(
      */
     if (ebml.id() != ID_CLUSTER && static_cast<unsigned int>(ebml.end_offset()) > end_offset) {
 
+#if DEBUG_PUBLISHER
       std::cout << "=> ebml.id: " << ebml.id() << ", ID_CLUSTER: " << ID_CLUSTER << std::endl;
       std::cout << "=> ebml.end_offset: " << ebml.end_offset() << ", end_offset: " << end_offset <<  std::endl;
       std::cout << "=> ebml.element_offset: " << ebml.element_offset() <<  std::endl;
+#endif
       /* The element is not fully loaded: we need more data, so we end
        * this processing cycle. The StreamInput will fill the buffer
        * and take care of the yet unprocessed element. We signal this
@@ -71,7 +75,9 @@ int StreamingState::process_data(
 
     case ID_TIMECODE: {
 
+#if DEBUG_PUBLISHER
       std::cout << "ID_TIMECODE" << std::endl;
+#endif
       // we have the timecode, so open a new cluster in our movie fragment
       cluster_time_code_ = EBML::load_unsigned(buffer, ebml.data_offset(), ebml.data_size());
 
@@ -82,7 +88,9 @@ int StreamingState::process_data(
     }
     case ID_SIMPLEBLOCK: {
 
+#if DEBUG_PUBLISHER
       std::cout << "ID_SIMPLEBLOCK" << std::endl;
+#endif
       int track_num = buffer[ebml.data_offset()] & 0xff;
       if ((track_num & 0x80) == 0) {
         std::cerr << "Track numbers > 127 are not implemented." << std::endl;
@@ -101,7 +109,7 @@ int StreamingState::process_data(
             fragment_.get()->close_cluster();
             stream_.get()->push_fragment(fragment_);
 
-            fragment_ = std::shared_ptr<MovieFragment>(new MovieFragment());
+            fragment_.reset(new MovieFragment());
             fragment_.get()->open_cluster(cluster_time_code_);
 
             // [TODO] stream_.post_event(new ServerEvent(input, stream, ServerEvent.INPUT_FRAGMENT_START));
@@ -126,7 +134,9 @@ int StreamingState::process_data(
     }
     case ID_BLOCKGROUP: {
 
+#if DEBUG_PUBLISHER
       std::cout << "ID_BLOCKGROUP" << std::endl;
+#endif
       fragment_.get()->append_block(
           buffer,
           ebml.element_offset(),
@@ -137,7 +147,9 @@ int StreamingState::process_data(
     }
     default:
 
+#if DEBUG_PUBLISHER
       std::cout << "ID_UNHANDLED" << std::endl;
+#endif
       break;
     }
 

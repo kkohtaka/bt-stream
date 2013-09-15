@@ -44,10 +44,14 @@ EBML::EBML(
 
   data_offset_ = offset;
 
+#if DEBUG_PUBLISHER
   std::cout << "==> EBML::id: " << id_ << ", size: " << size_ << ", data_offset: " << data_offset_ << std::endl;
+#endif
 }
 
 EBML::~EBML(void) {
+
+  //std::cout << "EBML deleted." << std::endl;
 }
 
 int EBML::load_unsigned(
@@ -142,8 +146,10 @@ int EBML::end_offset(void) {
   }
   if ((data_offset_ + size_) >= 0x100000000L) {
     // [TODO] Handle the error.
+#if DEBUG_PUBLISHER
     std::cout << "data_offset_: " << data_offset_ << std::endl;
     std::cout << "size_: " << size_ << std::endl;
+#endif
     ::exit(EXIT_FAILURE);
   }
   return data_offset_ + size_;

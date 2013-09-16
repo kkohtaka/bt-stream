@@ -1,15 +1,16 @@
 // Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
 // This file is available under the MIT license.
 
+#include "./streaming_state.h"
+
 #include <cstdio>
 
-#include "./streaming_state.h"
 #include "./ebml.h"
 
 StreamingState::StreamingState(
     std::shared_ptr<StreamInput> input,
     std::shared_ptr<Stream> stream,
-    int video_track_number)
+    int32_t video_track_number)
   : StreamInputState(),
     input_(input),
     stream_(stream),
@@ -22,17 +23,17 @@ StreamingState::~StreamingState(void) {
   std::printf("StreamingState deleted.\n");
 }
 
-int StreamingState::process_data(
-    char *buffer,
-    unsigned int offset,
-    unsigned int length
+uint32_t StreamingState::process_data(
+    uint8_t *buffer,
+    uint32_t offset,
+    uint32_t length
 ) {
-  const unsigned int end_offset = offset + length;
+  const uint32_t end_offset = offset + length;
   while (offset < end_offset) {
 #if DEBUG_PUBLISHER
   std::printf("process_data: offset: %d, length: %d\n", offset, length);
-  for (unsigned int i = 0; i < 32 && i + offset < length; ++i) {
-    std::printf("%d ", static_cast<int>(*(buffer + i + offset)));
+  for (uint32_t i = 0; i < 32 && i + offset < length; ++i) {
+    std::printf("%d ", *(buffer + i + offset));
   }
   std::printf("\n");
 #endif
@@ -42,7 +43,7 @@ int StreamingState::process_data(
      * possibility of infinite clusters (gstreamer's curlsink?).
      */
     if (ebml.id() != ID_CLUSTER &&
-        static_cast<unsigned int>(ebml.end_offset()) > end_offset) {
+        static_cast<uint32_t>(ebml.end_offset()) > end_offset) {
 #if DEBUG_PUBLISHER
       std::printf("=> ebml.id: %ld, ID_CLUSTER: %ld\n", ebml.id(), ID_CLUSTER);
       std::printf("=> ebml.end_offset: %d, end_offset: %d\n",
@@ -84,16 +85,16 @@ int StreamingState::process_data(
 #if DEBUG_PUBLISHER
       std::cout << "ID_SIMPLEBLOCK" << std::endl;
 #endif
-      int track_num = buffer[ebml.data_offset()] & 0xff;
+      int32_t track_num = buffer[ebml.data_offset()] & 0xff;
       if ((track_num & 0x80) == 0) {
         std::fprintf(stderr, "Track numbers > 127 are not implemented.\n");
       }
       track_num ^= 0x80;
 
-      int video_key_offset = -1;
+      int32_t video_key_offset = -1;
 
       if (track_num == video_track_number_) {
-        int flags = buffer[ebml.data_offset() + 3] & 0xff;
+        int32_t flags = buffer[ebml.data_offset() + 3] & 0xff;
         if ((flags & 0x80) != 0) {
           if (fragment_.get()->data_length() >= MINIMAL_FRAGMENT_LENGTH) {
             fragment_.get()->close_cluster();

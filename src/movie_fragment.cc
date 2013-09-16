@@ -17,7 +17,7 @@ MovieFragment::MovieFragment(void)
         0x00, 0x00, 0x00
     }),
     CLUSTER_HEAD_LENGTH(sizeof(CLUSTER_HEAD)),
-    data_(new char[1024 * 1024], [] (char *p) { delete [] p; }),
+    data_(new uint8_t[1024 * 1024], [] (uint8_t *p) { delete [] p; }),
     data_length_(0),
     cluster_offset_(-1),
     keyframe_offset_(-1),
@@ -37,7 +37,7 @@ MovieFragment::~MovieFragment(void) {
   std::printf("MovieFragment deleted.\n");
 }
 
-void MovieFragment::open_cluster(int time_code) {
+void MovieFragment::open_cluster(int32_t time_code) {
   if (cluster_offset_ != -1) {
     close_cluster();
   }
@@ -49,8 +49,8 @@ void MovieFragment::open_cluster(int time_code) {
   cluster_offset_ = data_length_;
   data_length_ += CLUSTER_HEAD_LENGTH;
 
-  int offset = cluster_offset_ + TIMECODE_LAST_OFFSET;
-  int code = time_code;
+  int32_t offset = cluster_offset_ + TIMECODE_LAST_OFFSET;
+  int32_t code = time_code;
   while (code > 0) {
     data_.get()[offset--] = code;
     code >>= 8;
@@ -62,10 +62,11 @@ void MovieFragment::close_cluster(void) {
     return;
   }
 
-  int cluster_length = data_length_ - cluster_offset_ - INITIAL_CLUSTER_LENGTH;
+  uint32_t cluster_length =
+      data_length_ - cluster_offset_ - INITIAL_CLUSTER_LENGTH;
 
-  int offset = cluster_offset_ + CLUSTER_LENGTH_LAST_OFFSET;
-  int code = cluster_length;
+  uint32_t offset = cluster_offset_ + CLUSTER_LENGTH_LAST_OFFSET;
+  uint32_t code = cluster_length;
   while (code > 0) {
     data_.get()[offset--] = code;
     code >>= 8;
@@ -75,10 +76,10 @@ void MovieFragment::close_cluster(void) {
 }
 
 void MovieFragment::append_key_block(
-    char *buffer,
-    int offset,
-    int length,
-    int keyframe_offset
+    uint8_t *buffer,
+    uint32_t offset,
+    uint32_t length,
+    uint32_t keyframe_offset
 ) {
   if (keyframe_offset_ > 0) {
     keyframe_offset_ = data_length_ + (keyframe_offset - offset);
@@ -89,9 +90,9 @@ void MovieFragment::append_key_block(
 }
 
 void MovieFragment::append_block(
-    char *buffer,
-    int offset,
-    int length
+    uint8_t *buffer,
+    uint32_t offset,
+    uint32_t length
 ) {
   if (1024 * 1024 < data_length_ + length) {
     return;
@@ -101,19 +102,19 @@ void MovieFragment::append_block(
   data_length_ += length;
 }
 
-std::shared_ptr<char> MovieFragment::data(void) {
+std::shared_ptr<uint8_t> MovieFragment::data(void) {
   return data_;
 }
 
-int MovieFragment::data_length(void) {
+uint32_t MovieFragment::data_length(void) {
   return data_length_;
 }
 
-int MovieFragment::keyframe_offset(void) {
+int32_t MovieFragment::keyframe_offset(void) {
   return keyframe_offset_;
 }
 
-int MovieFragment::keyframe_length(void) {
+int32_t MovieFragment::keyframe_length(void) {
   return keyframe_length_;
 }
 

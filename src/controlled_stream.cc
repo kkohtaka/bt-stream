@@ -5,7 +5,7 @@
 
 #include <cstdio>
 
-ControlledStream::ControlledStream(unsigned int max_clients)
+ControlledStream::ControlledStream(uint32_t max_clients)
   : Stream(),
     MAX_CLIENTS(max_clients),
     num_clients_(0) {

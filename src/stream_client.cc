@@ -7,7 +7,7 @@
 
 #include "./stream.h"
 
-const char StreamClient::http_header[] =
+const uint8_t StreamClient::http_header[] =
     "HTTP/1.1 200 OK\nContent-type: video/webm\nServer: bt-stream\n\n";
 
 void StreamClient::write_header_static(::uv_timer_t *timer, int status) {
@@ -75,14 +75,16 @@ void StreamClient::write_header(void) {
     auto header = stream_.get()->header();
 
     write_req_ = new ::uv_write_t();
-    ::uv_buf_t buf = ::uv_buf_init(header.get(), header_length);
+    ::uv_buf_t buf = ::uv_buf_init(
+        reinterpret_cast<char *>(header.get()),
+        header_length);
 
     write_req_->data = this;
 
 #if DEBUG_CONSUMER
     std::printf("===== HEADER (%d): ", header_length);
-    for (unsigned int i = 0; i < header_length; ++i) {
-      std::printf("%d ", static_cast<int>(*(header.get() + i)));
+    for (uint32_t i = 0; i < header_length; ++i) {
+      std::printf("%d ", *(header.get() + i));
     }
     std::printf("=====\n");
 #endif
@@ -129,7 +131,7 @@ void StreamClient::write_fragment(void) {
     ::uv_timer_start(&timer_, close_static, 0, 0);
 
   } else {
-    int stream_age = stream_.get()->fragment_age();
+    uint32_t stream_age = stream_.get()->fragment_age();
     if (age_ >= stream_age) {
       // Wait for a next fragment prepared.
 
@@ -142,8 +144,8 @@ void StreamClient::write_fragment(void) {
 
       auto fragment = stream_.get()->fragment();
 
-      const unsigned int PACKET_SIZE = 24 * 1024;
-      unsigned int fragment_length = fragment.get()->data_length();
+      const uint32_t PACKET_SIZE = 24 * 1024;
+      uint32_t fragment_length = fragment.get()->data_length();
 
       if (fragment_offset_ >= fragment_length) {
         // Wait and process Next Fragment.
@@ -163,7 +165,8 @@ void StreamClient::write_fragment(void) {
 
         write_req_ = new ::uv_write_t();
         ::uv_buf_t buf = ::uv_buf_init(
-            fragment.get()->data().get() + fragment_offset_,
+            reinterpret_cast<char *>(
+                fragment.get()->data().get() + fragment_offset_),
             fragment_length_);
 
         write_req_->data = this;
@@ -173,11 +176,9 @@ void StreamClient::write_fragment(void) {
             "===== FRAGMENT (%d, %d): ",
             fragment_offset_,
             fragment_length_);
-        for (unsigned int i = 0; i < 128 && i < fragment_length_; ++i) {
-          std::printf(
-              "%d ",
-              static_cast<int>(
-                  *(fragment.get()->data().get() + fragment_offset_ + i)));
+        for (uint32_t i = 0; i < 128 && i < fragment_length_; ++i) {
+          std::printf("%d ",
+              *(fragment.get()->data().get() + fragment_offset_ + i));
         }
         std::printf("\n");
 #endif
@@ -222,7 +223,7 @@ void StreamClient::run(void) {
 
   ::uv_buf_t buf =
       ::uv_buf_init(
-          const_cast<char *>(http_header),
+          const_cast<char *>(reinterpret_cast<const char *>(http_header)),
           sizeof(http_header) - 1);
 
   write_req_->data = this;

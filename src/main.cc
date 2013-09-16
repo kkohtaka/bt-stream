@@ -16,7 +16,7 @@ static std::shared_ptr<Stream> stream;
 static std::shared_ptr<StreamInput> input;
 static std::shared_ptr<StreamClient> stream_client;
 
-int start_publisher_server(::uv_tcp_t *server, const unsigned int port) {
+int start_publisher_server(::uv_tcp_t *server, const uint32_t port) {
   int ret = ::uv_tcp_init(loop, server);
   if (ret != 0) {
     std::fprintf(stderr, "%s error\n", ::uv_strerror(::uv_last_error(loop)));
@@ -58,7 +58,7 @@ int start_publisher_server(::uv_tcp_t *server, const unsigned int port) {
   return 0;
 }
 
-int start_consumer_server(::uv_tcp_t *server, const unsigned int port) {
+int start_consumer_server(::uv_tcp_t *server, const uint32_t port) {
   int ret = ::uv_tcp_init(loop, server);
   if (ret != 0) {
     std::fprintf(stderr, "%s error\n", ::uv_strerror(::uv_last_error(loop)));
@@ -108,14 +108,14 @@ int main() {
   stream = std::shared_ptr<Stream>(new Stream());
 
   ::uv_tcp_t publisher_server;
-  const unsigned int publisher_port = 8080;
+  const uint32_t publisher_port = 8080;
   ret = start_publisher_server(&publisher_server, publisher_port);
   if (ret != 0) {
     return EXIT_FAILURE;
   }
 
   ::uv_tcp_t consumer_server;
-  const unsigned int consumer_port = 8081;
+  const uint32_t consumer_port = 8081;
   ret = start_consumer_server(&consumer_server, consumer_port);
   if (ret != 0) {
     return EXIT_FAILURE;

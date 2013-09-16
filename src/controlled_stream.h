@@ -4,15 +4,16 @@
 #ifndef SRC_CONTROLLED_STREAM_H_
 #define SRC_CONTROLLED_STREAM_H_
 
+#include <inttypes.h>
 #include <string>
 #include "./stream.h"
 
 class ControlledStream : public Stream {
  private:
-  const unsigned int MAX_CLIENTS;
-  unsigned int num_clients_;
+  const uint32_t MAX_CLIENTS;
+  uint32_t num_clients_;
  public:
-  explicit ControlledStream(unsigned int num_clients);
+  explicit ControlledStream(uint32_t num_clients);
   virtual ~ControlledStream(void);
   bool subscribe(void);
   void unsubscribe(void);

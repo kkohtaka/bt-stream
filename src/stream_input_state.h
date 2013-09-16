@@ -4,14 +4,16 @@
 #ifndef SRC_STREAM_INPUT_STATE_H_
 #define SRC_STREAM_INPUT_STATE_H_
 
+#include <inttypes.h>
+
 class StreamInputState {
  public:
   StreamInputState(void);
   virtual ~StreamInputState(void);
-  virtual int process_data(
-      char *buffer,
-      unsigned int offset,
-      unsigned int length) = 0;
+  virtual uint32_t process_data(
+      uint8_t *buffer,
+      uint32_t offset,
+      uint32_t length) = 0;
 };
 
 #endif  // SRC_STREAM_INPUT_STATE_H_

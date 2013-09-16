@@ -7,9 +7,9 @@
 #include <cstdlib>
 
 EBML::EBML(
-    char *buffer,
-    unsigned int offset,
-    unsigned int length)
+    uint8_t *buffer,
+    uint32_t offset,
+    uint32_t length)
   : id_(0),
     size_(0),
     buffer_(buffer),
@@ -18,8 +18,8 @@ EBML::EBML(
     data_offset_(0) {
 #if DEBUG_EBML
   std::printf("=== EBML === ");
-  for (unsigned int i = 0; i < 32 && i < length; ++i) {
-    std::printf("%d ", static_cast<int>(*(buffer + offset + i)));
+  for (uint32_t i = 0; i < 32 && i < length; ++i) {
+    std::printf("%d ", *(buffer + offset + i));
   }
   std::printf("\n");
 
@@ -60,10 +60,10 @@ EBML::~EBML(void) {
 #endif
 }
 
-int EBML::load_unsigned(
-    char *buffer,
-    unsigned int offset,
-    unsigned int length
+uint32_t EBML::load_unsigned(
+    uint8_t *buffer,
+    uint32_t offset,
+    uint32_t length
 ) {
   int64_t num = 0;
   while (length > 0) {
@@ -74,10 +74,10 @@ int EBML::load_unsigned(
   return num;
 }
 
-int EBML::load_EBML_unsigned(
-    char *buffer,
-    unsigned int offset,
-    unsigned int length
+uint32_t EBML::load_EBML_unsigned(
+    uint8_t *buffer,
+    uint32_t offset,
+    uint32_t length
 ) {
   int64_t size_flag = 0x80;
   int64_t num = 0;
@@ -90,10 +90,10 @@ int EBML::load_EBML_unsigned(
   return num ^ size_flag;
 }
 
-int EBML::load_EBML_signed(
-    char *buffer,
-    unsigned int offset,
-    unsigned int length
+int32_t EBML::load_EBML_signed(
+    uint8_t *buffer,
+    uint32_t offset,
+    uint32_t length
 ) {
   int64_t size_flag = 0x80;
   int64_t num = 0;
@@ -119,29 +119,29 @@ int64_t EBML::data_size(void) {
   return size_;
 }
 
-int EBML::element_size(void) {
+int32_t EBML::element_size(void) {
   if (size_ == 0x1ffffffffffffffL) {
     return -1;
   }
   if (size_ >= 0x100000000L) {
     // [TODO] Handle the error.
   }
-  return static_cast<int>(data_offset_ - offset_ + size_);
+  return static_cast<int32_t>(data_offset_ - offset_ + size_);
 }
 
-char *EBML::buffer(void) {
+uint8_t *EBML::buffer(void) {
   return buffer_;
 }
 
-unsigned int EBML::data_offset(void) {
+uint32_t EBML::data_offset(void) {
   return data_offset_;
 }
 
-unsigned int EBML::element_offset(void) {
+uint32_t EBML::element_offset(void) {
   return offset_;
 }
 
-int EBML::end_offset(void) {
+int32_t EBML::end_offset(void) {
   if (size_ == 0x1ffffffffffffffL) {
     return -1;
   }

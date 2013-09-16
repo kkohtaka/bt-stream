@@ -31,17 +31,17 @@ bool StreamInput::is_running(void) {
   return running_;
 }
 
-unsigned char *StreamInput::header(void) {
+uint8_t *StreamInput::header(void) {
   return header_;
 }
 
-unsigned int StreamInput::header_length(void) {
+uint32_t StreamInput::header_length(void) {
   return header_length_;
 }
 
 void StreamInput::set_header(
-    unsigned char *header,
-    unsigned int header_length) {
+    uint8_t *header,
+    uint32_t header_length) {
   header_ = header;
   header_length_ = header_length;
 }
@@ -80,7 +80,7 @@ void StreamInput::change_state(std::shared_ptr<StreamInputState> state) {
 
 uv_buf_t StreamInput::on_alloc(size_t suggested_size) {
   return ::uv_buf_init(
-      buffer_.buffer.get() + buffer_.offset,
+      reinterpret_cast<char *>(buffer_.buffer.get() + buffer_.offset),
       buffer_.buffer_length - buffer_.offset);
 }
 
@@ -106,12 +106,12 @@ void StreamInput::on_read(ssize_t nread, uv_buf_t buf) {
           Client *client = reinterpret_cast<Client *>(parser->data);
           StreamInput *self = reinterpret_cast<StreamInput *>(client->data());
 
-          return self->on_body(buf, len);
+          return self->on_body(reinterpret_cast<const uint8_t *>(buf), len);
         });
   }
 }
 
-int StreamInput::on_body(const char *buf, size_t len) {
+int StreamInput::on_body(const uint8_t *buf, size_t len) {
   ::memmove(
       buffer_.buffer.get() + buffer_.offset,
       buf,
@@ -120,7 +120,7 @@ int StreamInput::on_body(const char *buf, size_t len) {
   buffer_.length += len;
 
   while (buffer_.length != 0) {
-    unsigned int new_offset = state_.get()->process_data(
+    uint32_t new_offset = state_.get()->process_data(
         buffer_.buffer.get(),
         0,
         buffer_.length);

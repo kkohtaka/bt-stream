@@ -20,7 +20,7 @@ bool Stream::is_running(void) {
   return running_;
 }
 
-int Stream::fragment_age(void) {
+uint32_t Stream::fragment_age(void) {
   return fragment_age_;
 }
 
@@ -28,15 +28,17 @@ std::shared_ptr<MovieFragment> Stream::fragment(void) {
   return fragment_;
 }
 
-std::shared_ptr<char> Stream::header(void) {
+std::shared_ptr<uint8_t> Stream::header(void) {
   return header_;
 }
 
-unsigned int Stream::header_length(void) {
+uint32_t Stream::header_length(void) {
   return header_length_;
 }
 
-void Stream::set_header(std::shared_ptr<char> header, int header_length) {
+void Stream::set_header(
+    std::shared_ptr<uint8_t> header,
+    uint32_t header_length) {
   header_.swap(header);
   header_length_ = header_length;
 }

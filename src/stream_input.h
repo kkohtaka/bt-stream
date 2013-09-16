@@ -1,11 +1,16 @@
-#ifndef __STREAM_INPUT_H__
-#define __STREAM_INPUT_H__
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
 
-#include "stream.h"
-#include "client.h"
-#include "stream_input_state.h"
+#ifndef SRC_STREAM_INPUT_H_
+#define SRC_STREAM_INPUT_H_
+
 #include <memory>
+
 #include <ctime>
+
+#include "./stream.h"
+#include "./client.h"
+#include "./stream_input_state.h"
 
 class StreamInputBuffer {
  public:
@@ -38,11 +43,11 @@ class StreamInput {
   void on_read(ssize_t nread, uv_buf_t buf);
   void on_close(void);
   int on_body(const char *buf, size_t len);
+
  public:
   StreamInput(
       std::shared_ptr<Stream> stream,
-      std::shared_ptr<Client> client
-  );
+      std::shared_ptr<Client> client);
   ~StreamInput(void);
   bool is_running(void);
   unsigned char *header(void);
@@ -52,5 +57,5 @@ class StreamInput {
   void change_state(std::shared_ptr<StreamInputState> state);
 };
 
-#endif // __STREAM_INPUT_H__
+#endif  // SRC_STREAM_INPUT_H_
 

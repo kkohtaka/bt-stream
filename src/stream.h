@@ -1,9 +1,13 @@
-#ifndef __STREAM_H__
-#define __STREAM_H__
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
+
+#ifndef SRC_STREAM_H_
+#define SRC_STREAM_H_
 
 #include <string>
 #include <memory>
-#include "movie_fragment.h"
+
+#include "./movie_fragment.h"
 
 class Stream {
  private:
@@ -24,5 +28,5 @@ class Stream {
   void push_fragment(std::shared_ptr<MovieFragment> fragment);
 };
 
-#endif // __STREAM_H__
+#endif  // SRC_STREAM_H_
 

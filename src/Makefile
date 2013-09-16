@@ -26,6 +26,11 @@ all: ${OBJS}
 clean:
 	rm -f *.o
 
+lint:
+	../bin/cpplint.py *.h
+	../bin/cpplint.py *.cc
+
 .PHONY:
 	clean
+	lint
 

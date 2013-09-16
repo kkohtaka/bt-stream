@@ -1,7 +1,10 @@
-#ifndef __CLIENT_H__
-#define __CLIENT_H__
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
 
-#include "uv.h"
+#ifndef SRC_CLIENT_H_
+#define SRC_CLIENT_H_
+
+#include "libuv/include/uv.h"
 #include "http-parser/http_parser.h"
 
 class Client {
@@ -16,15 +19,18 @@ class Client {
   int parse_request(
       ssize_t nread,
       uv_buf_t buf,
-      http_data_cb on_body
-  );
+      http_data_cb on_body);
   int accept(uv_stream_t *server);
   void start_reading(uv_alloc_cb alloc_cb, uv_read_cb read_cb);
-  void write(uv_write_t* req, uv_buf_t bufs[], int bufcnt, uv_write_cb write_cb);
+  void write(
+      uv_write_t* req,
+      uv_buf_t bufs[],
+      int bufcnt,
+      uv_write_cb write_cb);
   void close(uv_close_cb close_cb);
   void *data(void);
   void set_data(void *data);
 };
 
-#endif // __CLIENT_H__
+#endif  // SRC_CLIENT_H_
 

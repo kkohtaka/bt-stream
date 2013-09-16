@@ -1,13 +1,15 @@
-#include "client.h"
-#include "stream.h"
-#include "stream_input.h"
-#include "stream_client.h"
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
+
+#include <memory>
+
+#include "./client.h"
+#include "./stream.h"
+#include "./stream_input.h"
+#include "./stream_client.h"
 
 #include "libuv/include/uv.h"
 #include "http-parser/http_parser.h"
-
-#include <iostream>
-#include <memory>
 
 static ::uv_loop_t *loop;
 static std::shared_ptr<Stream> stream;
@@ -15,17 +17,16 @@ static std::shared_ptr<StreamInput> input;
 static std::shared_ptr<StreamClient> stream_client;
 
 int start_publisher_server(::uv_tcp_t *server, const unsigned int port) {
-
   int ret = ::uv_tcp_init(loop, server);
   if (ret != 0) {
-    std::cerr << ::uv_strerror(ret) << " error" << std::endl;
+    std::fprintf(stderr, "%s error\n", ::uv_strerror(::uv_last_error(loop)));
     return ret;
   }
 
   struct ::sockaddr_in bind_addr = ::uv_ip4_addr("0.0.0.0", port);
   ret = ::uv_tcp_bind(server, bind_addr);
   if (ret != 0) {
-    std::cerr << ::uv_strerror(ret) << " error" << std::endl;
+    std::fprintf(stderr, "%s error\n", ::uv_strerror(::uv_last_error(loop)));
     return ret;
   }
 
@@ -33,8 +34,7 @@ int start_publisher_server(::uv_tcp_t *server, const unsigned int port) {
       (::uv_stream_t *)server,
       128,
       [] (::uv_stream_t *server, int status) {
-
-        std::cout << "on_connect" << std::endl;
+        std::printf("on_connect\n");
 
         if (status == -1) {
           return;
@@ -48,29 +48,27 @@ int start_publisher_server(::uv_tcp_t *server, const unsigned int port) {
         } else {
           client.get()->close([] (::uv_handle_t *handle) {});
         }
-      }
-  );
+      });
   if (ret != 0) {
-    std::cerr << ::uv_strerror(ret) << " error" << std::endl;
+    std::fprintf(stderr, "%s error\n", ::uv_strerror(::uv_last_error(loop)));
     return ret;
   }
 
-  std::cout << "===== PUBLISHER SERVER LISTENING ON PORT: " << port << " =====" << std::endl;
+  std::printf("===== PUBLISHER SERVER LISTENING ON PORT: %d =====\n", port);
   return 0;
 }
 
 int start_consumer_server(::uv_tcp_t *server, const unsigned int port) {
-
   int ret = ::uv_tcp_init(loop, server);
   if (ret != 0) {
-    std::cerr << ::uv_strerror(ret) << " error" << std::endl;
+    std::fprintf(stderr, "%s error\n", ::uv_strerror(::uv_last_error(loop)));
     return ret;
   }
 
   struct ::sockaddr_in bind_addr = ::uv_ip4_addr("0.0.0.0", port);
   ret = ::uv_tcp_bind(server, bind_addr);
   if (ret != 0) {
-    std::cerr << ::uv_strerror(ret) << " error" << std::endl;
+    std::fprintf(stderr, "%s error\n", ::uv_strerror(::uv_last_error(loop)));
     return ret;
   }
 
@@ -78,33 +76,31 @@ int start_consumer_server(::uv_tcp_t *server, const unsigned int port) {
       (::uv_stream_t *)server,
       128,
       [] (::uv_stream_t *server, int status) {
-
-        std::cout << "on_connect" << std::endl;
+        std::printf("on_connect\n");
 
         if (status == -1) {
           return;
         }
 
-        stream_client = std::shared_ptr<StreamClient>(new StreamClient(loop, stream));
+        stream_client =
+            std::shared_ptr<StreamClient>(new StreamClient(loop, stream));
 
         if (stream_client.get()->accept(server) == 0) {
           stream_client.get()->run();
         } else {
           stream_client.get()->close([] (::uv_handle_t *handle) {});
         }
-      }
-  );
+      });
   if (ret != 0) {
-    std::cerr << ::uv_strerror(ret) << " error" << std::endl;
+    std::fprintf(stderr, "%s error\n", ::uv_strerror(::uv_last_error(loop)));
     return ret;
   }
 
-  std::cout << "===== CONSUMER SERVER LISTENING ON PORT: " << port << " =====" << std::endl;
+  std::printf("===== CONSUMER SERVER LISTENING ON PORT: %d =====\n", port);
   return 0;
 }
 
 int main() {
-
   int ret;
 
   loop = ::uv_default_loop();

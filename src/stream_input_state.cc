@@ -1,12 +1,14 @@
-#include "stream_input_state.h"
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
 
-#include <iostream>
+#include "./stream_input_state.h"
+
+#include <cstdio>
 
 StreamInputState::StreamInputState(void) {
 }
 
 StreamInputState::~StreamInputState(void) {
-
-  std::cout << "StreamInputState deleted." << std::endl;
+  std::printf("StreamInputState deleted.\n");
 }
 

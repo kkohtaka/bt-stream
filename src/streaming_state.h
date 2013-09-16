@@ -1,10 +1,14 @@
-#ifndef __STREAMING_STATE_H__
-#define __STREAMING_STATE_H__
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
 
-#include "stream_input_state.h"
-#include "stream.h"
-#include "stream_input.h"
+#ifndef SRC_STREAMING_STATE_H_
+#define SRC_STREAMING_STATE_H_
+
 #include <memory>
+
+#include "./stream_input_state.h"
+#include "./stream.h"
+#include "./stream_input.h"
 
 class StreamingState : public StreamInputState {
  private:
@@ -18,18 +22,17 @@ class StreamingState : public StreamInputState {
   int video_track_number_;
   int cluster_time_code_;
   std::shared_ptr<MovieFragment> fragment_;
+
  public:
   StreamingState(
       std::shared_ptr<StreamInput> input,
       std::shared_ptr<Stream> stream,
-      int video_track_number
-  );
+      int video_track_number);
   ~StreamingState(void);
   virtual int process_data(
       char *buffer,
       unsigned int offset,
-      unsigned int length
-  );
+      unsigned int length);
 };
 
-#endif // __STREAMING_STATE_H__
+#endif  // SRC_STREAMING_STATE_H_

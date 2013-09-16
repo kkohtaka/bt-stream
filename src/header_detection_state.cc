@@ -1,10 +1,13 @@
-#include "header_detection_state.h"
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
 
-#include "ebml.h"
-#include "streaming_state.h"
+#include "./header_detection_state.h"
+
 #include <memory>
 #include <cstring>
-#include <iostream>
+
+#include "./ebml.h"
+#include "./streaming_state.h"
 
 const unsigned char HeaderDetectionState::infiniteSegment[] = {
   0x18, 0x53, 0x80, 0x67, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
@@ -12,15 +15,13 @@ const unsigned char HeaderDetectionState::infiniteSegment[] = {
 
 HeaderDetectionState::HeaderDetectionState(
     std::shared_ptr<StreamInput> input,
-    std::shared_ptr<Stream> stream
-) :
-    input_(input),
+    std::shared_ptr<Stream> stream)
+  : input_(input),
     stream_(stream) {
 }
 
 HeaderDetectionState::~HeaderDetectionState(void) {
-
-  std::cout << "HeaderDetectionState deleted." << std::endl;
+  std::printf("HeaderDetectionState deleted.\n");
 }
 
 int HeaderDetectionState::process_data(
@@ -28,29 +29,28 @@ int HeaderDetectionState::process_data(
     unsigned int offset,
     unsigned int length
 ) {
-
-  std::cout << "process_data: offset: " << offset << ", length: " << length << std::endl;
+  std::printf("process_data: offset: %d, length: %d\n", offset, length);
   for (unsigned int i = 0; i < 32 && i < length; ++i) {
-    std::cout << (int)*(buffer + i) << ' ';
+    std::printf("%d ", static_cast<int>(*(buffer + i)));
   }
-  std::cout << std::endl;
+  std::printf("\n");
 
   const unsigned int
       start_offset = offset,
       end_offset = offset + length;
 
-  std::cout << "=== start_offset: " << start_offset << ", end_offset: " << end_offset << std::endl;
+  std::printf("=== start_offset: %d, end_offset: %d ===\n",
+      start_offset, end_offset);
 
   std::shared_ptr<unsigned char> header_buffer(
       new unsigned char[65536],
-      [] (unsigned char *p) { delete [] p; }
-  );
-  unsigned int header_length = 0;
+      [] (unsigned char *p) { delete [] p; });
+  uint64_t header_length = 0;
 
   EBML ebml(buffer, offset, length);
 
   if (ebml.id() != ID_EBML) {
-    std::cerr << "First element is not EBML!" << std::endl;
+    fprintf(stderr, "First element is not EBML!\n");
     throw std::exception();
   }
 
@@ -58,8 +58,7 @@ int HeaderDetectionState::process_data(
   ::memcpy(
       header_buffer.get() + header_length,
       buffer + ebml.element_offset(),
-      ebml.element_size()
-  );
+      ebml.element_size());
   header_length += ebml.element_size();
 
   offset = ebml.end_offset();
@@ -68,8 +67,7 @@ int HeaderDetectionState::process_data(
   ::memcpy(
       header_buffer.get() + header_length,
       &infiniteSegment[0],
-      sizeof(infiniteSegment)
-  );
+      sizeof(infiniteSegment));
   header_length += sizeof(infiniteSegment);
 
   // Search an Segment.
@@ -86,7 +84,7 @@ int HeaderDetectionState::process_data(
     return start_offset;
   }
 
-  std::cout << "Segment found." << std::endl;
+  std::printf("Segment found.\n");
 
   int segment_data_offset = ebml.data_offset();
 
@@ -102,14 +100,13 @@ int HeaderDetectionState::process_data(
     return start_offset;
   }
 
-  std::cout << "Info found." << std::endl;
+  std::printf("Info found.\n");
 
   // Copy Info header buffer.
   ::memcpy(
       header_buffer.get() + header_length,
       buffer + ebml.element_offset(),
-      ebml.element_size()
-  );
+      ebml.element_size());
   header_length += ebml.element_size();
 
   // Search Tracks.
@@ -121,18 +118,17 @@ int HeaderDetectionState::process_data(
 
   // Not found.
   if (offset >= end_offset) {
-    std::cout << "Tracks not found." << std::endl;
+    std::printf("Tracks not found.\n");
     return start_offset;
   }
 
-  std::cout << "Tracks found." << std::endl;
+  std::printf("Tracks found.\n");
 
   // Copy Tracks header buffer.
   ::memcpy(
       header_buffer.get() + header_length,
       buffer + ebml.element_offset(),
-      ebml.element_size()
-  );
+      ebml.element_size());
   header_length += ebml.element_size();
 
   // Search a video track's id.
@@ -154,13 +150,11 @@ int HeaderDetectionState::process_data(
         track_number = EBML::load_unsigned(
             buffer,
             property.data_offset(),
-            property.data_size()
-        );
+            property.data_size());
       }
       offset = property.end_offset();
     }
-    std::cout << "Track no: " << track_number
-        << ", type: " << track_type << std::endl;
+    std::printf("Track no: %d, type: %d\n", track_number, track_type);
 
     if (track_type == TRACK_TYPE_VIDEO) {
       video_track_number = track_number;
@@ -169,18 +163,16 @@ int HeaderDetectionState::process_data(
     offset = track.end_offset();
   }
 
-  std::cout << "All's well." << std::endl;
+  std::printf("ALL'S WELL.\n");
 
   std::shared_ptr<char> header(
       new char[header_length],
-      [] (char *p) { delete [] p; }
-  );
+      [] (char *p) { delete [] p; });
   ::memcpy(header.get(), header_buffer.get(), header_length);
   stream_.get()->set_header(header, header_length);
 
   input_.get()->change_state(std::shared_ptr<StreamInputState>(
-      new StreamingState(input_, stream_, video_track_number)
-  ));
+      new StreamingState(input_, stream_, video_track_number)));
 
   return segment_data_offset;
 }

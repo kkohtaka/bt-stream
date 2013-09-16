@@ -1,10 +1,14 @@
-#ifndef __HEADER_DETECTION_STATE_H__
-#define __HEADER_DETECTION_STATE_H__
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
 
-#include "stream_input_state.h"
-#include "stream.h"
-#include "stream_input.h"
+#ifndef SRC_HEADER_DETECTION_STATE_H_
+#define SRC_HEADER_DETECTION_STATE_H_
+
 #include <memory>
+
+#include "./stream_input_state.h"
+#include "./stream.h"
+#include "./stream_input.h"
 
 class HeaderDetectionState : public StreamInputState {
  private:
@@ -21,14 +25,12 @@ class HeaderDetectionState : public StreamInputState {
  public:
   HeaderDetectionState(
       std::shared_ptr<StreamInput> input,
-      std::shared_ptr<Stream> stream
-  );
+      std::shared_ptr<Stream> stream);
   virtual ~HeaderDetectionState(void);
   virtual int process_data(
       char *buffer,
       unsigned int offset,
-      unsigned int length
-  );
+      unsigned int length);
 };
 
-#endif // __HEADER_DETECTION_STATE_H__
+#endif  // SRC_HEADER_DETECTION_STATE_H_

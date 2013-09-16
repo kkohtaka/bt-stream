@@ -1,5 +1,8 @@
-#ifndef __MOVIE_FRAGMENTH__
-#define __MOVIE_FRAGMENTH__
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
+
+#ifndef SRC_MOVIE_FRAGMENT_H_
+#define SRC_MOVIE_FRAGMENT_H_
 
 #include <string>
 #include <memory>
@@ -16,6 +19,7 @@ class MovieFragment {
   int cluster_offset_;
   int keyframe_offset_;
   int keyframe_length_;
+
  public:
   MovieFragment(void);
   MovieFragment& operator=(const MovieFragment& movie_fragment);
@@ -26,18 +30,16 @@ class MovieFragment {
       char *buffer,
       int offset,
       int length,
-      int keyframe_offset
-  );
+      int keyframe_offset);
   void append_block(
       char *buffer,
       int offset,
-      int length
-  );
+      int length);
   std::shared_ptr<char> data(void);
   int data_length(void);
   int keyframe_offset(void);
   int keyframe_length(void);
 };
 
-#endif // __MOVIE_FRAGMENTH__
+#endif  // SRC_MOVIE_FRAGMENT_H_
 

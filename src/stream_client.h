@@ -1,10 +1,13 @@
-#ifndef __STREAM_CLIENT_H__
-#define __STREAM_CLIENT_H__
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
 
-#include "client.h"
-#include "uv.h"
+#ifndef SRC_STREAM_CLIENT_H_
+#define SRC_STREAM_CLIENT_H_
 
 #include <memory>
+
+#include "./client.h"
+#include "libuv/include/uv.h"
 
 class Stream;
 
@@ -32,5 +35,5 @@ class StreamClient : public Client {
   void run(void);
 };
 
-#endif // __STREAM_CLIENT_H__
+#endif  // SRC_STREAM_CLIENT_H_
 

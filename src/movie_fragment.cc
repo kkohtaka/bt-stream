@@ -1,10 +1,12 @@
-#include "movie_fragment.h"
+// Copyright (c) 2013 Kazumasa Kohtaka. All rights reserved.
+// This file is available under the MIT license.
 
-#include <iostream>
+#include "./movie_fragment.h"
+
 #include <cstring>
 
-MovieFragment::MovieFragment(void) :
-    INITIAL_CLUSTER_LENGTH(10),
+MovieFragment::MovieFragment(void)
+  : INITIAL_CLUSTER_LENGTH(10),
     TIMECODE_LAST_OFFSET(18),
     CLUSTER_LENGTH_LAST_OFFSET(8),
     CLUSTER_HEAD({
@@ -23,7 +25,6 @@ MovieFragment::MovieFragment(void) :
 }
 
 MovieFragment& MovieFragment::operator=(const MovieFragment& movie_fragment) {
-
   data_ = movie_fragment.data_;
   data_length_ = movie_fragment.data_length_;
   cluster_offset_ = movie_fragment.cluster_offset_;
@@ -33,12 +34,10 @@ MovieFragment& MovieFragment::operator=(const MovieFragment& movie_fragment) {
 }
 
 MovieFragment::~MovieFragment(void) {
-
-  std::cout << "MovieFragment deleted." << std::endl;
+  std::printf("MovieFragment deleted.\n");
 }
 
 void MovieFragment::open_cluster(int time_code) {
-
   if (cluster_offset_ != -1) {
     close_cluster();
   }
@@ -46,8 +45,7 @@ void MovieFragment::open_cluster(int time_code) {
   memcpy(
       data_.get() + data_length_,
       CLUSTER_HEAD,
-      CLUSTER_HEAD_LENGTH
-  );
+      CLUSTER_HEAD_LENGTH);
   cluster_offset_ = data_length_;
   data_length_ += CLUSTER_HEAD_LENGTH;
 
@@ -60,7 +58,6 @@ void MovieFragment::open_cluster(int time_code) {
 }
 
 void MovieFragment::close_cluster(void) {
-
   if (cluster_offset_ == -1) {
     return;
   }
@@ -83,7 +80,6 @@ void MovieFragment::append_key_block(
     int length,
     int keyframe_offset
 ) {
-
   if (keyframe_offset_ > 0) {
     keyframe_offset_ = data_length_ + (keyframe_offset - offset);
     keyframe_length_ = length - (keyframe_offset - offset);
@@ -97,7 +93,6 @@ void MovieFragment::append_block(
     int offset,
     int length
 ) {
-
   if (1024 * 1024 < data_length_ + length) {
     return;
   }
@@ -107,22 +102,18 @@ void MovieFragment::append_block(
 }
 
 std::shared_ptr<char> MovieFragment::data(void) {
-
   return data_;
 }
 
 int MovieFragment::data_length(void) {
-
   return data_length_;
 }
 
 int MovieFragment::keyframe_offset(void) {
-
   return keyframe_offset_;
 }
 
 int MovieFragment::keyframe_length(void) {
-
   return keyframe_length_;
 }
 

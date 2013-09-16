@@ -23,7 +23,7 @@ class StreamClient : public Client {
   uint32_t stream_age_;
   uint32_t fragment_offset_;
   uint32_t fragment_length_;
-  ::uv_write_t *write_req_;
+  std::shared_ptr< ::uv_write_t> write_req_;
   static void write_header_static(::uv_timer_t *timer, int status);
   static void write_fragment_static(::uv_timer_t *timer, int status);
   static void close_static(::uv_timer_t *timer, int status);

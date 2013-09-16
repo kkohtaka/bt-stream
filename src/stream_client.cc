@@ -41,15 +41,15 @@ StreamClient::StreamClient(
     stream_age_(0),
     fragment_offset_(0),
     fragment_length_(0),
-    write_req_(nullptr) {
+    write_req_(new ::uv_write_t()) {
   ::uv_timer_init(loop, &timer_);
 
   timer_.data = this;
 }
 
 StreamClient::~StreamClient(void) {
-  if (write_req_) {
-    ::uv_cancel(reinterpret_cast< ::uv_req_t *>(write_req_));
+  if (write_req_.get()) {
+    ::uv_cancel(reinterpret_cast< ::uv_req_t *>(write_req_.get()));
   }
 
   ::uv_timer_stop(&timer_);
@@ -74,12 +74,12 @@ void StreamClient::write_header(void) {
 
     auto header = stream_.get()->header();
 
-    write_req_ = new ::uv_write_t();
+    write_req_.reset(new ::uv_write_t());
     ::uv_buf_t buf = ::uv_buf_init(
         reinterpret_cast<char *>(header.get()),
         header_length);
 
-    write_req_->data = this;
+    write_req_.get()->data = this;
 
 #if DEBUG_CONSUMER
     std::printf("===== HEADER (%d): ", header_length);
@@ -89,7 +89,7 @@ void StreamClient::write_header(void) {
     std::printf("=====\n");
 #endif
 
-    write(write_req_, &buf, 1, [] (::uv_write_t *req, int status) {
+    write(write_req_.get(), &buf, 1, [] (::uv_write_t *req, int status) {
       StreamClient *client = reinterpret_cast<StreamClient *>(req->data);
 
       if (status == 0) {
@@ -110,9 +110,6 @@ void StreamClient::write_header(void) {
 
         ::uv_timer_start(&client->timer_, close_static, 0, 0);
       }
-
-      delete req;
-      client->write_req_ = nullptr;
     });
   }
 }
@@ -163,13 +160,13 @@ void StreamClient::write_fragment(void) {
           fragment_length_ = PACKET_SIZE;
         }
 
-        write_req_ = new ::uv_write_t();
+        write_req_.reset(new ::uv_write_t());
         ::uv_buf_t buf = ::uv_buf_init(
             reinterpret_cast<char *>(
                 fragment.get()->data().get() + fragment_offset_),
             fragment_length_);
 
-        write_req_->data = this;
+        write_req_.get()->data = this;
 
 #if DEBUG_CONSUMER
         std::printf(
@@ -183,7 +180,7 @@ void StreamClient::write_fragment(void) {
         std::printf("\n");
 #endif
 
-        write(write_req_, &buf, 1, [] (::uv_write_t *req, int status) {
+        write(write_req_.get(), &buf, 1, [] (::uv_write_t *req, int status) {
           StreamClient *client = reinterpret_cast<StreamClient *>(req->data);
 
           if (status == 0) {
@@ -205,9 +202,6 @@ void StreamClient::write_fragment(void) {
 
             ::uv_timer_start(&client->timer_, close_static, 0, 0);
           }
-
-          delete req;
-          client->write_req_ = nullptr;
         });
       }
     }
@@ -219,16 +213,16 @@ void StreamClient::run(void) {
   std::printf("StreamClient::run() %p\n", this);
 #endif
 
-  write_req_ = new ::uv_write_t();
+  write_req_.reset(new ::uv_write_t());
 
   ::uv_buf_t buf =
       ::uv_buf_init(
           const_cast<char *>(reinterpret_cast<const char *>(http_header)),
           sizeof(http_header) - 1);
 
-  write_req_->data = this;
+  write_req_.get()->data = this;
 
-  write(write_req_, &buf, 1, [] (::uv_write_t *req, int status) {
+  write(write_req_.get(), &buf, 1, [] (::uv_write_t *req, int status) {
     StreamClient *client = reinterpret_cast<StreamClient *>(req->data);
 
     if (status == 0) {
@@ -251,9 +245,6 @@ void StreamClient::run(void) {
 
       ::uv_timer_start(&client->timer_, close_static, 0, 0);
     }
-
-    delete req;
-    client->write_req_ = nullptr;
   });
 }
 

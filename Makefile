@@ -1,3 +1,4 @@
+MAKE=make
 CC=g++
 CFLAGS=-g -O0 -Wall -Werror -std=gnu++0x
 LIBS=-lrt -pthread
@@ -20,8 +21,8 @@ OBJS= \
 run: bt-stream
 	./bt-stream
 
-bt-stream: ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser_g.o
-	${CC} -o $@ ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser_g.o ${LIBS}
+bt-stream: ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser.o
+	${CC} -o $@ ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser.o ${LIBS}
 
 .cc.o:
 	${CC} ${CFLAGS} -c $<
@@ -29,21 +30,19 @@ bt-stream: ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser_g.o
 libuv/out/Debug/libuv.a:
 	( \
 		cd libuv; \
-		rm -rf build/; \
-		git clone https://git.chromium.org/external/gyp.git build/gyp; \
-		./gyp_uv -f make; \
-		make -C out/; \
+		./gyp_uv -f ${MAKE}; \
+		${MAKE} -C out/; \
 	)
 
-http-parser/http_parser_g.o: http-parser/http_parser.c
-	make -C http-parser/ http_parser_g.o
+http-parser/http_parser.o: http-parser/http_parser.c
+	${MAKE} -C http-parser/ http_parser.o
 
 clean:
-	rm bt-stream
-	rm main.o
-	rm libuv/out/Debug/libuv.a
-	make -C libuv/ clean
-	make -C http-parser/ clean
+	rm -f bt-stream
+	rm -f *.o
+	rm -f libuv/out/Debug/libuv.a
+	${MAKE} -C libuv/ clean
+	${MAKE} -C http-parser/ clean
 
 .PHONY:
 	clean

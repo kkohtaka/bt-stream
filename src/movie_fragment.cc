@@ -33,7 +33,7 @@ MovieFragment& MovieFragment::operator=(const MovieFragment& movie_fragment) {
 }
 
 MovieFragment::~MovieFragment(void) {
-  std::printf("MovieFragment deleted.\n");
+  std::printf("MovieFragment deleted. %p\n", static_cast<void *>(this));
 }
 
 void MovieFragment::open_cluster(int32_t time_code) {

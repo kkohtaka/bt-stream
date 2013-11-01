@@ -17,7 +17,7 @@ class StreamingState : public StreamInputState {
   static const uint32_t ID_BLOCKGROUP = 0xa0;
   static const uint32_t ID_TIMECODE = 0xe7;
   static const uint32_t MINIMAL_FRAGMENT_LENGTH = 100 * 1024;
-  std::shared_ptr<StreamInput> input_;
+  StreamInput *input_;
   std::shared_ptr<Stream> stream_;
   int32_t video_track_number_;
   int32_t cluster_time_code_;
@@ -25,10 +25,10 @@ class StreamingState : public StreamInputState {
 
  public:
   StreamingState(
-      std::shared_ptr<StreamInput> input,
+      StreamInput *input,
       std::shared_ptr<Stream> stream,
       int32_t video_track_number);
-  ~StreamingState(void);
+  virtual ~StreamingState(void);
   virtual uint32_t process_data(
       uint8_t *buffer,
       uint32_t offset,

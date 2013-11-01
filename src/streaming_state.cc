@@ -6,7 +6,7 @@
 #include "./ebml.h"
 
 StreamingState::StreamingState(
-    std::shared_ptr<StreamInput> input,
+    StreamInput *input,
     std::shared_ptr<Stream> stream,
     int32_t video_track_number)
   : StreamInputState(),
@@ -18,7 +18,7 @@ StreamingState::StreamingState(
 }
 
 StreamingState::~StreamingState(void) {
-  std::printf("StreamingState deleted.\n");
+  std::printf("StreamingState deleted. %p\n", static_cast<void *>(this));
 }
 
 uint32_t StreamingState::process_data(
@@ -29,11 +29,11 @@ uint32_t StreamingState::process_data(
   const uint32_t end_offset = offset + length;
   while (offset < end_offset) {
 #if DEBUG_PUBLISHER
-  std::printf("process_data: offset: %d, length: %d\n", offset, length);
-  for (uint32_t i = 0; i < 32 && i + offset < length; ++i) {
-    std::printf("%d ", *(buffer + i + offset));
-  }
-  std::printf("\n");
+    std::printf("process_data: offset: %d, length: %d\n", offset, length);
+    for (uint32_t i = 0; i < 32 && i + offset < length; ++i) {
+      std::printf("%d ", *(buffer + i + offset));
+    }
+    std::printf("\n");
 #endif
     EBML ebml(buffer, offset, length);
 

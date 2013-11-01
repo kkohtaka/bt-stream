@@ -17,8 +17,8 @@ Client::Client(::uv_loop_t *loop)
 }
 
 Client::~Client(void) {
-  stop_reading();
   std::printf("Client deleted. %p\n", static_cast<void *>(this));
+  stop_reading();
 }
 
 size_t Client::parse_request(

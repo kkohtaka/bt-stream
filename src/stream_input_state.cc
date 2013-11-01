@@ -8,6 +8,6 @@ StreamInputState::StreamInputState(void) {
 }
 
 StreamInputState::~StreamInputState(void) {
-  std::printf("StreamInputState deleted.\n");
+  std::printf("StreamInputState deleted. %p\n", static_cast<void *>(this));
 }
 

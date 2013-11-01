@@ -46,13 +46,13 @@ StreamClient::StreamClient(
 }
 
 StreamClient::~StreamClient(void) {
+  std::printf("StreamClient deleted. %p\n", static_cast<void *>(this));
+
   if (write_req_.get()) {
     ::uv_cancel(reinterpret_cast< ::uv_req_t *>(write_req_.get()));
   }
 
   ::uv_timer_stop(&timer_);
-
-  std::printf("StreamClient deleted. %p\n", static_cast<void *>(this));
 }
 
 void StreamClient::write_header(void) {
@@ -60,7 +60,7 @@ void StreamClient::write_header(void) {
   std::printf("StreamClient::write_header() %p\n", static_cast<void *>(this));
 #endif
 
-  auto header_length = stream_.get()->header_length();
+  auto header_length = stream_->header_length();
 
   if (header_length == 0) {
     // Wait for a header prepared.
@@ -70,14 +70,14 @@ void StreamClient::write_header(void) {
   } else {
     // Write the header on a stream.
 
-    auto header = stream_.get()->header();
+    auto header = stream_->header();
 
     write_req_.reset(new ::uv_write_t());
     ::uv_buf_t buf = ::uv_buf_init(
         reinterpret_cast<char *>(header.get()),
         header_length);
 
-    write_req_.get()->data = this;
+    write_req_->data = this;
 
 #if DEBUG_CONSUMER
     std::printf("===== HEADER (%d): ", header_length);
@@ -120,13 +120,13 @@ void StreamClient::write_fragment(void) {
   if (!running_) {
     // Since the output stream was closed, do nothing.
 
-  } else if (!stream_.get()->is_running()) {
+  } else if (!stream_->is_running()) {
     // Since an input stream was closed, close the output stream.
 
     ::uv_timer_start(&timer_, close_static, 0, 0);
 
   } else {
-    uint32_t stream_age = stream_.get()->fragment_age();
+    uint32_t stream_age = stream_->fragment_age();
     if (age_ >= stream_age) {
       // Wait for a next fragment prepared.
 
@@ -137,10 +137,10 @@ void StreamClient::write_fragment(void) {
         // [TODO] stream.postEvent(ServerEvent.CLIET_FRAGMENT_SKIP);
       }
 
-      auto fragment = stream_.get()->fragment();
+      auto fragment = stream_->fragment();
 
       const uint32_t PACKET_SIZE = 24 * 1024;
-      uint32_t fragment_length = fragment.get()->data_length();
+      uint32_t fragment_length = fragment->data_length();
 
       if (fragment_offset_ >= fragment_length) {
         // Wait and process Next Fragment.
@@ -161,10 +161,10 @@ void StreamClient::write_fragment(void) {
         write_req_.reset(new ::uv_write_t());
         ::uv_buf_t buf = ::uv_buf_init(
             reinterpret_cast<char *>(
-                fragment.get()->data().get() + fragment_offset_),
+                fragment->data().get() + fragment_offset_),
             fragment_length_);
 
-        write_req_.get()->data = this;
+        write_req_->data = this;
 
 #if DEBUG_CONSUMER
         std::printf(
@@ -173,7 +173,7 @@ void StreamClient::write_fragment(void) {
             fragment_length_);
         for (uint32_t i = 0; i < 128 && i < fragment_length_; ++i) {
           std::printf("%d ",
-              *(fragment.get()->data().get() + fragment_offset_ + i));
+              *(fragment->data().get() + fragment_offset_ + i));
         }
         std::printf("\n");
 #endif
@@ -218,7 +218,7 @@ void StreamClient::run(void) {
           const_cast<char *>(reinterpret_cast<const char *>(http_header)),
           sizeof(http_header) - 1);
 
-  write_req_.get()->data = this;
+  write_req_->data = this;
 
   write(write_req_.get(), &buf, 1, [] (::uv_write_t *req, int status) {
     StreamClient *client = reinterpret_cast<StreamClient *>(req->data);

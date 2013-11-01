@@ -17,12 +17,13 @@ StreamInput::StreamInput(
     header_(),
     header_length_(0),
     chunk_size_(0),
+    state_(nullptr),
     buffer_() {
   client_.get()->set_data(this);
 }
 
 StreamInput::~StreamInput(void) {
-  std::printf("StreamInput deleted.\n");
+  std::printf("StreamInput deleted. %p\n", static_cast<void *>(this));
 }
 
 bool StreamInput::is_running(void) {
@@ -49,11 +50,8 @@ void StreamInput::run(void) {
 
   // [TODO] postEvent stream_.publish(Stream::INPUT_START);
 
-  change_state(
-      std::shared_ptr<StreamInputState>(
-          new HeaderDetectionState(
-              std::shared_ptr<StreamInput>(this),
-              stream_)));
+  change_state(std::shared_ptr<StreamInputState>(
+        new HeaderDetectionState(this, stream_)));
 
   if (running_ && stream_.get()->is_running()) {
     client_.get()->start_reading(

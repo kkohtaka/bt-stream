@@ -20,11 +20,11 @@ class HeaderDetectionState : public StreamInputState {
   static const int32_t ID_TRACKNUMBER = 0xD7;
   static const int32_t TRACK_TYPE_VIDEO = 1;
   static const uint8_t infiniteSegment[];
-  std::shared_ptr<StreamInput> input_;
+  StreamInput *input_;
   std::shared_ptr<Stream> stream_;
  public:
   HeaderDetectionState(
-      std::shared_ptr<StreamInput> input,
+      StreamInput *input,
       std::shared_ptr<Stream> stream);
   virtual ~HeaderDetectionState(void);
   virtual uint32_t process_data(

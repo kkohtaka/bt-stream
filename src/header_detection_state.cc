@@ -12,14 +12,14 @@ const uint8_t HeaderDetectionState::infiniteSegment[] = {
 };
 
 HeaderDetectionState::HeaderDetectionState(
-    std::shared_ptr<StreamInput> input,
+    StreamInput *input,
     std::shared_ptr<Stream> stream)
   : input_(input),
     stream_(stream) {
 }
 
 HeaderDetectionState::~HeaderDetectionState(void) {
-  std::printf("HeaderDetectionState deleted.\n");
+  std::printf("HeaderDetectionState deleted. %p\n", static_cast<void *>(this));
 }
 
 uint32_t HeaderDetectionState::process_data(
@@ -169,7 +169,7 @@ uint32_t HeaderDetectionState::process_data(
   ::memcpy(header.get(), header_buffer.get(), header_length);
   stream_.get()->set_header(header, header_length);
 
-  input_.get()->change_state(std::shared_ptr<StreamInputState>(
+  input_->change_state(std::shared_ptr<StreamInputState>(
       new StreamingState(input_, stream_, video_track_number)));
 
   return segment_data_offset;

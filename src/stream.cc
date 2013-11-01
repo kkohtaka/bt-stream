@@ -12,7 +12,7 @@ Stream::Stream(void)
 }
 
 Stream::~Stream(void) {
-  std::printf("Stream deleted.\n");
+  std::printf("Stream deleted. %p\n", static_cast<void *>(this));
 }
 
 bool Stream::is_running(void) {

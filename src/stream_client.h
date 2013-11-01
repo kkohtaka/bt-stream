@@ -32,7 +32,7 @@ class StreamClient : public Client {
 
  public:
   StreamClient(::uv_loop_t *loop, std::shared_ptr<Stream> stream);
-  ~StreamClient(void);
+  virtual ~StreamClient(void);
   void run(void);
 };
 

@@ -2,7 +2,6 @@
 // This file is available under the MIT license.
 
 #include "./controlled_stream.h"
-
 #include <cstdio>
 
 ControlledStream::ControlledStream(uint32_t max_clients)

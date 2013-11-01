@@ -2,10 +2,8 @@
 // This file is available under the MIT license.
 
 #include "./header_detection_state.h"
-
 #include <memory>
 #include <cstring>
-
 #include "./ebml.h"
 #include "./streaming_state.h"
 

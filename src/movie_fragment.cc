@@ -2,20 +2,19 @@
 // This file is available under the MIT license.
 
 #include "./movie_fragment.h"
-
 #include <cstring>
 
 MovieFragment::MovieFragment(void)
   : INITIAL_CLUSTER_LENGTH(10),
     TIMECODE_LAST_OFFSET(18),
     CLUSTER_LENGTH_LAST_OFFSET(8),
-    CLUSTER_HEAD({
+    CLUSTER_HEAD {
         0x1F, 0x43, 0xB6, 0x75,
         0x08, 0x00, 0x00, 0x00,
         0x00, 0xE7, 0x88, 0x00,
         0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00
-    }),
+    },
     CLUSTER_HEAD_LENGTH(sizeof(CLUSTER_HEAD)),
     data_(new uint8_t[1024 * 1024], [] (uint8_t *p) { delete [] p; }),
     data_length_(0),

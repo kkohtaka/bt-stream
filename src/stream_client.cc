@@ -2,9 +2,7 @@
 // This file is available under the MIT license.
 
 #include "./stream_client.h"
-
 #include <cstdio>
-
 #include "./stream.h"
 
 const uint8_t StreamClient::http_header[] =
@@ -54,12 +52,12 @@ StreamClient::~StreamClient(void) {
 
   ::uv_timer_stop(&timer_);
 
-  std::printf("StreamClient deleted. %p\n", this);
+  std::printf("StreamClient deleted. %p\n", static_cast<void *>(this));
 }
 
 void StreamClient::write_header(void) {
 #if DEBUG_CONSUMER
-  std::printf("StreamClient::write_header() %p\n", this);
+  std::printf("StreamClient::write_header() %p\n", static_cast<void *>(this));
 #endif
 
   auto header_length = stream_.get()->header_length();
@@ -94,7 +92,7 @@ void StreamClient::write_header(void) {
 
       if (status == 0) {
 #if DEBUG_CONSUMER
-        std::cout << "StreamClient::write_header() -> WRITE OK" << std::endl;
+        std::printf("StreamClient::write_header() -> WRITE OK\n");
 #endif
 
         // Start writing fragments.
@@ -103,7 +101,7 @@ void StreamClient::write_header(void) {
 
       } else {
 #if DEBUG_CONSUMER
-        std::cout << "StreamClient::write_header() -> WRITE NG" << std::endl;
+        std::printf("StreamClient::write_header() -> WRITE NG\n");
 #endif
 
         // Close the output stream.
@@ -116,7 +114,7 @@ void StreamClient::write_header(void) {
 
 void StreamClient::write_fragment(void) {
 #if DEBUG_CONSUMER
-  std::printf("StreamClient::write_fragment() %p\n", this);
+  std::printf("StreamClient::write_fragment() %p\n", static_cast<void *>(this));
 #endif
 
   if (!running_) {
@@ -210,7 +208,7 @@ void StreamClient::write_fragment(void) {
 
 void StreamClient::run(void) {
 #if DEBUG_CONSUMER
-  std::printf("StreamClient::run() %p\n", this);
+  std::printf("StreamClient::run() %p\n", static_cast<void *>(this));
 #endif
 
   write_req_.reset(new ::uv_write_t());
@@ -227,7 +225,7 @@ void StreamClient::run(void) {
 
     if (status == 0) {
 #if DEBUG_CONSUMER
-      std::cout << "StreamClient::run() -> WRITE OK" << std::endl;
+      std::printf("StreamClient::run() -> WRITE OK\n");
 #endif
 
       // [TODO] stream.postEvent(CLIENT_START);
@@ -238,7 +236,7 @@ void StreamClient::run(void) {
 
     } else {
 #if DEBUG_CONSUMER
-      std::cout << "StreamClient::run() -> WRITE NG" << std::endl;
+      std::printf("StreamClient::run() -> WRITE NG\n");
 #endif
 
       // Close the output stream.
@@ -250,7 +248,7 @@ void StreamClient::run(void) {
 
 void StreamClient::on_close(void) {
 #if DEBUG_CONSUMER
-  std::printf("StreamClient::on_close() %p\n", this);
+  std::printf("StreamClient::on_close() %p\n", static_cast<void *>(this));
 #endif
 
   // [TODO] stream.postEvent(ServerEvent.CLIET_STOP);

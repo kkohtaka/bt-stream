@@ -1,24 +1,19 @@
 MAKE=make
 CC=g++
-CFLAGS=-g -O0 -Wall -Werror -std=gnu++0x
-LIBS=-lrt -pthread
+LINT=./bin/cpplint.py
+VPATH=src
+CFLAGS=-Ilibuv/include -Ihttp-parser -g -O0 -Wall -Werror --pedantic-error -std=gnu++11 -DDEBUG_CONSUMER
+LIBS=-lrt -pthread -lbluetooth -lstdc++
+
+.SUFFIXES: .o .cc .h
+
+%.o: %.h
+%.o: %.cc
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 srcdir := src
 
-SRCS= \
-	$(srcdir)/main.cc \
-	$(srcdir)/movie_fragment.cc \
-	$(srcdir)/stream.cc \
-	$(srcdir)/controlled_stream.cc \
-	$(srcdir)/client.cc \
-	$(srcdir)/stream_client.cc \
-	$(srcdir)/stream_input.cc \
-	$(srcdir)/stream_input_state.cc \
-	$(srcdir)/header_detection_state.cc \
-	$(srcdir)/streaming_state.cc \
-	$(srcdir)/ebml.cc \
-
-OBJS= \
+objects := \
 	$(srcdir)/main.o \
 	$(srcdir)/movie_fragment.o \
 	$(srcdir)/stream.o \
@@ -30,39 +25,42 @@ OBJS= \
 	$(srcdir)/header_detection_state.o \
 	$(srcdir)/streaming_state.o \
 	$(srcdir)/ebml.o \
+	$(srcdir)/Util.o \
+	$(srcdir)/HCI.o \
+	$(srcdir)/SDP.o \
+	$(srcdir)/RFCOMM.o \
 
-run: bt-stream
-	./bt-stream
-
-bt-stream: ${SRCS} libuv/out/Debug/libuv.a http-parser/http_parser.o
-	${MAKE} -C $(srcdir)
-	${CC} -o $@ ${OBJS} libuv/out/Debug/libuv.a http-parser/http_parser.o ${LIBS}
-
-$(srcdir)/%.o: $(srcdir)/%.cc $(srcdir)/%.c
-	${CC} ${CFLAGS} -c $<
+bt-stream: $(objects)
+bt-stream: libuv/out/Debug/libuv.a
+bt-stream: http-parser/http_parser.o
+	$(CC) -o $@ $(objects) libuv/out/Debug/libuv.a http-parser/http_parser.o $(LIBS)
 
 libuv/out/Debug/libuv.a:
 	( \
 		cd libuv; \
-		./gyp_uv -f ${MAKE}; \
-		${MAKE} -C out/; \
+		./gyp_uv -f $(MAKE); \
+		$(MAKE) -C out/; \
 	)
 
 http-parser/http_parser.o: http-parser/http_parser.c
-	${MAKE} -C http-parser/ http_parser.o
+	$(MAKE) -C http-parser/ http_parser.o
+
+run: bt-stream
+	./bt-stream
 
 clean:
 	rm -f bt-stream
-	rm -f *.o
-	${MAKE} -C libuv/ clean
-	${MAKE} -C http-parser/ clean
-	${MAKE} -C $(srcdir) clean
+	rm -f $(srcdir)/*.o
+	rm -rf libuv/out/
+	$(MAKE) -C libuv/ clean
+	$(MAKE) -C http-parser/ clean
 
 lint:
-	${MAKE} -C $(srcdir) lint
+	$(LINT) $(srcdir)/*.h
+	$(LINT) $(srcdir)/*.cc
 
 .PHONY:
-	${OBJS}
+	$(objects)
 	clean
 	lint
 

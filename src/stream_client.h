@@ -4,11 +4,10 @@
 #ifndef SRC_STREAM_CLIENT_H_
 #define SRC_STREAM_CLIENT_H_
 
+#include <uv.h>
 #include <inttypes.h>
 #include <memory>
-
 #include "./client.h"
-#include "libuv/include/uv.h"
 
 class Stream;
 

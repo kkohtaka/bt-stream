@@ -2,9 +2,7 @@
 // This file is available under the MIT license.
 
 #include "./streaming_state.h"
-
 #include <cstdio>
-
 #include "./ebml.h"
 
 StreamingState::StreamingState(

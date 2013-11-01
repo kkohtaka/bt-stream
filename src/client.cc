@@ -2,7 +2,6 @@
 // This file is available under the MIT license.
 
 #include "./client.h"
-
 #include <cstdio>
 
 Client::Client(::uv_loop_t *loop)
@@ -18,7 +17,8 @@ Client::Client(::uv_loop_t *loop)
 }
 
 Client::~Client(void) {
-  std::printf("Client deleted. %p\n", this);
+  stop_reading();
+  std::printf("Client deleted. %p\n", static_cast<void *>(this));
 }
 
 size_t Client::parse_request(
@@ -43,6 +43,11 @@ void Client::start_reading(::uv_alloc_cb alloc_cb, ::uv_read_cb read_cb) {
   ::uv_read_start(
       reinterpret_cast< ::uv_stream_t *>(&handle_),
       alloc_cb, read_cb);
+}
+
+void Client::stop_reading(void) {
+  ::uv_read_stop(
+      reinterpret_cast< ::uv_stream_t *>(&handle_));
 }
 
 void Client::write(

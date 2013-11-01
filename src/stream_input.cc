@@ -2,12 +2,10 @@
 // This file is available under the MIT license.
 
 #include "./stream_input.h"
-
 #include <sstream>
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
-
 #include "./header_detection_state.h"
 
 StreamInput::StreamInput(
@@ -132,7 +130,8 @@ int StreamInput::on_body(const uint8_t *buf, size_t len) {
       break;
     }
 
-    if (new_offset >= buffer_.offset + buffer_.length) {
+    if (new_offset > buffer_.offset + buffer_.length) {
+      std::printf("new_offset: %d, buffer_.offset: %d, buffer_.length: %d\n", new_offset, buffer_.offset, buffer_.length);
       throw std::exception();
     }
 

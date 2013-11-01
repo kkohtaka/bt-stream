@@ -2,7 +2,6 @@
 // This file is available under the MIT license.
 
 #include "./ebml.h"
-
 #include <cstdio>
 #include <cstdlib>
 

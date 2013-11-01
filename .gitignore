@@ -16,3 +16,7 @@
 /bt-stream
 /core
 *.o
+
+# Other files
+/data
+/log

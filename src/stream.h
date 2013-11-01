@@ -7,7 +7,6 @@
 #include <inttypes.h>
 #include <string>
 #include <memory>
-
 #include "./movie_fragment.h"
 
 class Stream {

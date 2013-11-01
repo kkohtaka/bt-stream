@@ -4,8 +4,8 @@
 #ifndef SRC_CLIENT_H_
 #define SRC_CLIENT_H_
 
-#include "libuv/include/uv.h"
-#include "http-parser/http_parser.h"
+#include <uv.h>
+#include <http_parser.h>
 
 class Client {
  private:
@@ -25,6 +25,7 @@ class Client {
   void start_reading(
       ::uv_alloc_cb alloc_cb,
       ::uv_read_cb read_cb);
+  void stop_reading(void);
   void write(
       ::uv_write_t* req,
       ::uv_buf_t bufs[],

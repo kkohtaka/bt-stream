@@ -7,7 +7,6 @@
 #include <inttypes.h>
 #include <memory>
 #include <ctime>
-
 #include "./stream.h"
 #include "./client.h"
 #include "./stream_input_state.h"

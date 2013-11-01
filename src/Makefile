@@ -15,6 +15,10 @@ OBJS= \
 	header_detection_state.o \
 	streaming_state.o \
 	ebml.o \
+	Util.o \
+	HCI.o \
+	SDP.o \
+	RFCOMM.o \
 
 .SUFFIXES: .o .cc
 

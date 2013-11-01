@@ -6,7 +6,6 @@
 
 #include <inttypes.h>
 #include <memory>
-
 #include "./stream_input_state.h"
 #include "./stream.h"
 #include "./stream_input.h"

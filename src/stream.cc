@@ -2,7 +2,6 @@
 // This file is available under the MIT license.
 
 #include "./stream.h"
-
 #include <cstdio>
 
 Stream::Stream(void)
